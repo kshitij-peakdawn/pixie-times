@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pixie Times</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1208;
+    --ink-muted: #6b6052;
+    --ink-faint: #b5a998;
+    --paper: #faf7f2;
+    --paper-warm: #f2ede4;
+    --paper-card: #fffcf8;
+    --accent: #c0392b;
+    --accent-light: #f9ebe9;
+    --accent-border: #e8b4ae;
+    --gold: #b8861a;
+    --gold-light: #fdf4de;
+    --rule: #d9d0c3;
+    --badge-rbi: #1a4a8c;       --badge-rbi-bg: #e8f0fb;
+    --badge-launch: #0f6e56;    --badge-launch-bg: #e1f5ee;
+    --badge-feature: #7f3fbf;   --badge-feature-bg: #f3eafd;
+    --badge-fee: #8c4a1a;       --badge-fee-bg: #fdf0e8;
+    --badge-upi: #0c548c;       --badge-upi-bg: #e8f5ff;
+    --badge-industry: #b8861a;  --badge-industry-bg: #fdf4de;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Masthead ── */
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(26,18,8,0.06);
+  }
+  .masthead-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 2rem 0.8rem;
+    gap: 1rem;
+  }
+  .logo-area { display: flex; align-items: baseline; gap: 0.55rem; }
+  .logo {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 5vw, 2.5rem);
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+  .logo span { color: var(--accent); }
+  .logo-tagline {
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+    display: none;
+  }
+  @media (min-width: 500px) { .logo-tagline { display: block; } }
+
+  .masthead-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .edition-selector {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .edition-label {
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .edition-select {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--ink);
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 3px 24px 3px 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 7px center;
+    cursor: pointer;
+    font-weight: 500;
+    max-width: 200px;
+  }
+  .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+
+  .refresh-info {
+    font-size: 0.67rem;
+    color: var(--ink-faint);
+  }
+  .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
+
+  /* ── Page layout ── */
+  .page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; }
+
+  /* ── Edition banner ── */
+  .edition-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.4rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--rule);
+    gap: 0.75rem;
+  }
+  .edition-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .edition-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .edition-stories {
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+  }
+  .past-chip {
+    display: inline-block;
+    background: var(--gold-light);
+    border: 1px solid #e8d090;
+    color: var(--gold);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── News list ── */
+  .news-list { display: flex; flex-direction: column; }
+
+  /* ── News row ── */
+  .news-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 1.05rem 0.5rem;
+    border-bottom: 1px solid var(--paper-warm);
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 -0.5rem;
+    transition: background 0.1s;
+  }
+  .news-row:last-child { border-bottom: none; }
+  .news-row:hover { background: var(--paper-card); }
+
+  .row-left { flex: 1; min-width: 0; }
+  .row-right {
+    flex-shrink: 0;
+    padding-left: 1.25rem;
+    padding-top: 3px;
+  }
+
+  .row-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.3rem;
+  }
+  .row-headline {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .row-summary {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.4rem;
+  }
+  .row-footer {
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+  }
+  .row-source { font-weight: 500; color: var(--ink-muted); }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    padding: 2px 6px;
+    white-space: nowrap;
+  }
+  .badge-launch   { background: var(--badge-launch-bg);   color: var(--badge-launch); }
+  .badge-feature  { background: var(--badge-feature-bg);  color: var(--badge-feature); }
+  .badge-rbi      { background: var(--badge-rbi-bg);      color: var(--badge-rbi); }
+  .badge-fee      { background: var(--badge-fee-bg);      color: var(--badge-fee); }
+  .badge-upi      { background: var(--badge-upi-bg);      color: var(--badge-upi); }
+  .badge-industry { background: var(--badge-industry-bg); color: var(--badge-industry); }
+
+  /* ── Impact ── */
+  .impact {
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .impact-high { background: #ffeaea; color: #991a1a; }
+  .impact-med  { background: #fff6e0; color: #8c5c00; }
+  .impact-low  { background: #eaf5ea; color: #276127; }
+
+  /* ── Detail page ── */
+  .detail-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    animation: fadeUp 0.2s ease both;
+  }
+  .detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--font-body);
+    padding: 0;
+    margin-bottom: 1.75rem;
+    transition: color 0.12s;
+  }
+  .detail-back:hover { color: var(--accent); }
+  .detail-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 0.85rem;
+    flex-wrap: wrap;
+  }
+  .detail-headline {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 4vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+  .detail-byline {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 1.5rem;
+  }
+  .detail-byline strong { color: var(--ink-muted); font-weight: 500; }
+  .detail-body {
+    font-size: 0.93rem;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+  .detail-body p { margin-bottom: 1rem; }
+  .detail-highlight {
+    background: var(--paper-warm);
+    border-left: 3px solid var(--accent);
+    padding: 0.85rem 1.1rem;
+    border-radius: 0 5px 5px 0;
+    margin: 1.5rem 0 1rem;
+  }
+  .detail-highlight-label {
+    font-size: 0.63rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    font-family: var(--font-body);
+  }
+  .detail-highlight-text {
+    font-size: 0.87rem;
+    color: var(--ink);
+    line-height: 1.65;
+  }
+  .detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 1.75rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--rule);
+  }
+  .tag {
+    font-size: 0.68rem;
+    background: var(--paper-warm);
+    color: var(--ink-muted);
+    border-radius: 3px;
+    padding: 2px 8px;
+  }
+  .read-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent-border);
+    padding-bottom: 1px;
+    margin-top: 0.5rem;
+    transition: opacity 0.12s;
+  }
+  .read-more-link:hover { opacity: 0.75; }
+
+  /* ── Footer ── */
+  .site-footer {
+    text-align: center;
+    border-top: 1px solid var(--rule);
+    padding: 1.5rem;
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .news-list .news-row { animation: fadeUp 0.25s ease both; }
+  .news-row:nth-child(2) { animation-delay: 0.04s; }
+  .news-row:nth-child(3) { animation-delay: 0.08s; }
+  .news-row:nth-child(4) { animation-delay: 0.12s; }
+  .news-row:nth-child(5) { animation-delay: 0.16s; }
+  .news-row:nth-child(6) { animation-delay: 0.20s; }
+  .news-row:nth-child(7) { animation-delay: 0.24s; }
+  .news-row:nth-child(8) { animation-delay: 0.28s; }
+  .news-row:nth-child(9) { animation-delay: 0.32s; }
+
+  @media (max-width: 540px) {
+    .masthead-top { padding: 0.65rem 1rem; }
+    .row-right { display: none; }
+    .page { padding: 1.25rem 1rem 3rem; }
+    .detail-wrap { padding: 1.25rem 1rem 3rem; }
+    .edition-select { max-width: 140px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const { useState } = React;
+
+// ─── Mock Editions (replace news arrays with real API data later) ──────────────
+const EDITIONS = [
+  {
+    id: "2025-W12",
+    label: "Mar 17 – 23, 2025",
+    isCurrent: true,
+    news: [
+      {
+        id: 1, category: "launch", badge: "badge-launch", badgeLabel: "New Launch", impact: "high",
+        headline: "HDFC Bank unveils Pixel Play Credit Card targeting Gen Z with no joining fee",
+        summary: "HDFC Bank has launched 'Pixel Play', a zero-fee credit card aimed at first-time credit users aged 18–28, offering 5% cashback on OTT platforms, gaming, and food delivery with a gamified rewards dashboard.",
+        tags: ["HDFC Bank", "Gen Z", "Cashback", "Zero Fee"],
+        source: "Economic Times", date: "Mar 18, 2025",
+        body: `HDFC Bank launched the Pixel Play Credit Card this week, positioning it as a gateway card for Gen Z consumers entering formal credit for the first time. The card carries no joining or annual fee and is built entirely around digital-first habits.
+
+Key features include 5% cashback on OTT subscriptions (Netflix, Prime, Hotstar), 4% on food delivery apps (Swiggy, Zomato), and 3% on gaming and app purchases. All other spends earn 1% cashback capped at ₹500 per month.
+
+The card introduces a "level-up" mechanic — cardholders who cross spending milestones unlock higher reward caps and exclusive offers, borrowing design language from mobile gaming.`,
+        highlight: { label: "Why it matters for your team", text: "First major bank to gamify credit card UX. Competitors will likely follow suit — watch for similar mechanics from SBI Cards and Axis in Q2." },
+        url: "#"
+      },
+      {
+        id: 2, category: "rbi", badge: "badge-rbi", badgeLabel: "RBI Guideline", impact: "high",
+        headline: "RBI mandates credit card issuers to provide 30-day free closure window, no exit charges",
+        summary: "The Reserve Bank of India has issued a circular requiring all scheduled commercial banks to allow credit card holders a 30-day window to close their card post-activation without any foreclosure or annual fee charges.",
+        tags: ["RBI", "Consumer Protection", "Closure Policy"],
+        source: "RBI Circular", date: "Mar 19, 2025",
+        body: `In a significant consumer protection move, the Reserve Bank of India issued Circular No. RBI/2025-26/44 on March 19, mandating that all credit card issuers provide a 30-day free cancellation window immediately after card activation.
+
+Under the new rules, banks cannot charge any exit fee, pro-rated annual fee, or joining fee recovery if a cardholder requests closure within 30 days. The regulation applies to all card variants including super-premium cards.
+
+Banks have been given 60 days to update their terms and conditions, product literature, and customer communication systems. Non-compliance attracts a penalty framework under the Payment and Settlement Systems Act.`,
+        highlight: { label: "Design + product implication", text: "Onboarding flows must now surface a clear 30-day exit path. Teams should audit activation UX — dark patterns that obscure closure options will be under regulatory scrutiny." },
+        url: "#"
+      },
+      {
+        id: 3, category: "feature", badge: "badge-feature", badgeLabel: "Feature Change", impact: "high",
+        headline: "Axis Bank Magnus trims airport lounge access from unlimited to 8 visits per quarter",
+        summary: "Axis Bank has revised the Magnus Credit Card's lounge access policy effective April 1, capping domestic and international visits at 8 combined per quarter, down from the previously unlimited benefit.",
+        tags: ["Axis Bank", "Magnus", "Lounge", "Devaluation"],
+        source: "CardInsider", date: "Mar 17, 2025",
+        body: `Axis Bank has announced a significant revision to its flagship Magnus Credit Card's lounge access benefit, effective April 1, 2025. Cardholders who previously enjoyed unlimited domestic and international lounge access through Priority Pass and DreamFolks will now face an 8-visit cap per quarter.
+
+The change follows a broader industry trend — ICICI Sapphiro and HDFC Infinia introduced similar caps in 2024. Axis cites "sustainable program management" for the revision.
+
+Existing Magnus holders will be notified via SMS and email by March 25. Those whose primary use case was lounge access are expected to evaluate alternatives.`,
+        highlight: { label: "Competitive landscape", text: "SBI Elite (unlimited domestic, capped intl) and HDFC Infinia remain best-in-class for lounge access. Good angle for a competitor feature comparison." },
+        url: "#"
+      },
+      {
+        id: 4, category: "upi", badge: "badge-upi", badgeLabel: "UPI", impact: "med",
+        headline: "NPCI extends Credit Line on UPI pilot to 10 new NBFCs after RBI green-light",
+        summary: "Following RBI's extension of the credit line on UPI framework to NBFCs, NPCI has onboarded 10 new non-banking finance companies into the live pilot, expanding short-tenor credit access for tier-2 and tier-3 users.",
+        tags: ["NPCI", "UPI", "NBFC", "Credit Line"],
+        source: "Business Standard", date: "Mar 20, 2025",
+        body: `NPCI's credit line on UPI pilot, which was previously restricted to scheduled commercial banks, has now been extended to include 10 NBFCs following the Reserve Bank of India's revised framework issued in February.
+
+The participating NBFCs include Bajaj Finance, Muthoot FinCorp, and several regional microfinance institutions. Users transacting on these NBFC-issued credit lines will see them appear as a UPI payment option alongside their bank accounts.
+
+Credit limits range from ₹5,000 to ₹1 lakh with tenors of 30 to 90 days. The feature is live on PhonePe, Paytm, and Google Pay for eligible users.`,
+        highlight: { label: "Business opportunity", text: "This opens a new acquisition channel for credit products — UPI as the distribution layer. Banks should watch NBFC-led credit line adoption closely as a threat to co-branded card strategies." },
+        url: "#"
+      },
+      {
+        id: 5, category: "fee", badge: "badge-fee", badgeLabel: "Fee Change", impact: "med",
+        headline: "SBI Card raises annual fee waiver threshold for SimplyCLICK and SimplySAVE cards",
+        summary: "SBI Cards has increased the fee waiver spend threshold for SimplyCLICK from ₹1 lakh to ₹1.25 lakh and SimplySAVE from ₹90,000 to ₹1.1 lakh, effective from the billing cycle starting April 15.",
+        tags: ["SBI Card", "Fee Waiver", "SimplyCLICK", "SimplySAVE"],
+        source: "Moneycontrol", date: "Mar 16, 2025",
+        body: `SBI Cards has quietly revised the spend-linked annual fee waiver thresholds for two of its most popular mass-market products. The SimplyCLICK Credit Card now requires ₹1.25 lakh in annual spends (up from ₹1 lakh) to have its ₹499 annual fee waived. SimplySAVE's threshold rises from ₹90,000 to ₹1.1 lakh.
+
+These cards have a combined active base estimated at over 80 lakh users, making this one of the largest fee structure changes in the industry this year.
+
+SBI Card shared the update via email and app notifications, with a 30-day notice period as mandated by RBI's revised card guidelines.`,
+        highlight: { label: "What this means for users", text: "Customers spending ₹8,000–₹10,000/month — the core SimplyCLICK segment — will now incur the fee. Expect some churn toward HDFC MoneyBack+ or Amazon Pay ICICI." },
+        url: "#"
+      },
+      {
+        id: 6, category: "launch", badge: "badge-launch", badgeLabel: "New Launch", impact: "med",
+        headline: "American Express launches 'Gold Reserve' card in India with ₹50,000 annual fee and 5X Membership Rewards",
+        summary: "Amex India has introduced the Gold Reserve Card, its highest-tier India-specific product, positioning it against HDFC Infinia and SBI Aurum with 5X Membership Rewards on dining, travel, and international spends.",
+        tags: ["Amex", "Premium", "Membership Rewards", "Luxury"],
+        source: "Livemint", date: "Mar 18, 2025",
+        body: `American Express India launched the Gold Reserve Credit Card this week at an annual fee of ₹50,000 (plus GST), its most premium India-specific offering to date. The card targets India's ultra-HNI segment — individuals with annual income above ₹50 lakh.
+
+Benefits include 5X Membership Rewards on all dining and international transactions, unlimited airport lounge access globally via Priority Pass Prestige, a dedicated concierge service, and a complimentary Taj Epicure membership worth ₹15,000.
+
+Notably, Membership Rewards earned on this card have no expiry and can be transferred to 18 airline and hotel partners at a 1:1 ratio — a first for Amex India.`,
+        highlight: { label: "Competitive context", text: "HDFC Infinia remains dominant at ₹12,500 fee. Amex's ₹50K positioning is a different category play entirely — luxury aspiration over value optimization." },
+        url: "#"
+      },
+      {
+        id: 7, category: "rbi", badge: "badge-rbi", badgeLabel: "RBI Guideline", impact: "med",
+        headline: "RBI proposes co-branded card data norms, limiting partner access to category-level aggregates only",
+        summary: "A new RBI discussion paper proposes restricting co-branding partners' access to cardholder transaction data to category-level aggregates, not individual records — potentially reshaping airline, e-commerce, and retail co-brand programs.",
+        tags: ["RBI", "Co-branded Cards", "Data Privacy"],
+        source: "RBI Discussion Paper", date: "Mar 21, 2025",
+        body: `The Reserve Bank of India released a consultation paper on March 21 proposing significant restrictions on data flows between card-issuing banks and their co-branding partners. The paper proposes that co-branding entities — airlines, retail chains, e-commerce platforms — receive only aggregated, category-level transaction summaries rather than itemised transaction data.
+
+Currently, partners like Amazon, Flipkart, and Air India receive detailed spending data that powers personalised offers. The proposed change would fundamentally alter the value exchange in co-brand partnerships.
+
+Comments are due by April 30, and the framework is expected to be finalised by Q3 2025.`,
+        highlight: { label: "Strategic alert", text: "This could devalue co-brand programs significantly. Product teams at banks with major e-commerce partnerships (ICICI-Amazon, Axis-Flipkart) should begin scenario planning now." },
+        url: "#"
+      },
+      {
+        id: 8, category: "industry", badge: "badge-industry", badgeLabel: "Industry", impact: "low",
+        headline: "Credit card outstanding crosses ₹3 lakh crore milestone for the first time in India",
+        summary: "RBI data for February 2025 shows total credit card outstanding balances crossed the ₹3 lakh crore mark for the first time, driven by rising revolving credit usage and EMI conversions among existing cardholders.",
+        tags: ["Market Data", "RBI", "Credit Growth"],
+        source: "RBI Monthly Bulletin", date: "Mar 17, 2025",
+        body: `Reserve Bank of India's monthly bulletin released this week reveals that total credit card outstanding balances reached ₹3.02 lakh crore as of February 2025 — a first for the Indian market and a 26% year-on-year increase.
+
+The growth is driven by two factors: an expanded cardholder base now at 10.8 crore active cards, and rising utilisation rates among existing holders. The share of revolving credit has risen to 38% from 31% a year ago.
+
+Interest income for card issuers has consequently improved, but RBI analysts flag increasing credit risk in the segment, particularly for cards issued below the ₹3 lakh income threshold.`,
+        highlight: { label: "Market signal", text: "₹3L crore milestone + rising revolve rates = opportunity for EMI products and balance transfer offers, but also signals credit quality stress ahead." },
+        url: "#"
+      },
+      {
+        id: 9, category: "feature", badge: "badge-feature", badgeLabel: "Feature Change", impact: "low",
+        headline: "ICICI Amazon Pay card quietly adds 2% cashback on offline grocery spends at supermarkets",
+        summary: "ICICI Bank has updated the Amazon Pay credit card's reward structure to include 2% cashback on offline grocery purchases at supermarkets, up from 1% previously. The change is live from March 15.",
+        tags: ["ICICI", "Amazon Pay", "Cashback", "Grocery"],
+        source: "CardInsider", date: "Mar 15, 2025",
+        body: `The ICICI Amazon Pay Credit Card, one of India's most widely held co-branded cards with over 1.2 crore issued cards, has received a quiet but meaningful benefit upgrade. Effective March 15, offline grocery spends at supermarkets (identified by MCC 5411) now earn 2% cashback, up from 1%.
+
+The change was not widely announced — it appeared as a footnote update on the card's terms page. CardInsider's team discovered it through a user report.
+
+Amazon and ICICI are likely positioning this to capture grocery wallet share ahead of BigBasket's Cosmo card launch, which offers 3% on BigBasket purchases and 2% on offline grocery.`,
+        highlight: { label: "Learnings for design teams", text: "Silent benefit upgrades are a retention lever. But lack of proactive communication means most users won't know — a missed engagement opportunity. Consider surfacing such changes in card app UX." },
+        url: "#"
+      }
+    ]
+  },
+  {
+    id: "2025-W11",
+    label: "Mar 10 – 16, 2025",
+    isCurrent: false,
+    news: [
+      {
+        id: 101, category: "launch", badge: "badge-launch", badgeLabel: "New Launch", impact: "high",
+        headline: "Kotak811 launches instant credit card with video KYC approval in under 3 minutes",
+        summary: "Kotak Mahindra Bank's digital arm Kotak811 has introduced a fully digital credit card issuance flow, promising approval and virtual card delivery in under 3 minutes using video KYC and bureau-based underwriting.",
+        tags: ["Kotak811", "Digital KYC", "Instant Card"],
+        source: "Financial Express", date: "Mar 14, 2025",
+        body: `Kotak Mahindra Bank's digital banking platform Kotak811 this week launched an end-to-end digital credit card issuance flow that eliminates physical documentation entirely. The bank claims a median approval time of 2 minutes 47 seconds in early testing.
+
+The flow uses Video KYC (V-KYC) for identity verification, bureau data from CIBIL and Experian for creditworthiness assessment, and immediately issues a virtual card number for online use. The physical card follows by courier within 3 working days.
+
+The card itself offers 2% cashback on all digital spends and no annual fee for the first year.`,
+        highlight: { label: "Product benchmark", text: "The 3-minute onboarding bar is now set for competitors. Axis and Yes Bank have 8–12 minute flows. This will pressure teams across the industry to audit their digital issuance stacks." },
+        url: "#"
+      },
+      {
+        id: 102, category: "rbi", badge: "badge-rbi", badgeLabel: "RBI Guideline", impact: "med",
+        headline: "RBI issues FAQs clarifying billing cycle change rules after wave of cardholder complaints",
+        summary: "Following a spike in consumer complaints about banks unilaterally changing billing cycles, RBI published FAQs clarifying that cardholders must be given at least 30 days' notice and are entitled to one free change request annually.",
+        tags: ["RBI", "Billing Cycle", "Consumer Rights"],
+        source: "RBI FAQ", date: "Mar 11, 2025",
+        body: `The Reserve Bank of India published a FAQ document this week addressing one of the most common credit card grievances filed with the Banking Ombudsman in FY25 — unilateral changes to billing cycles by issuing banks.
+
+The FAQs clarify that banks must provide a minimum 30-day advance notice before changing a cardholder's billing cycle. Additionally, each cardholder is entitled to one free billing cycle change request per calendar year, which must be processed within 7 working days.
+
+The document also addresses disputed transactions, minimum due calculation methods, and EMI conversion refunds.`,
+        highlight: { label: "Design implication", text: "Banks must build a 30-day notice mechanism into any backend billing system change. Product teams should audit whether their notification architecture supports this." },
+        url: "#"
+      },
+      {
+        id: 103, category: "fee", badge: "badge-fee", badgeLabel: "Fee Change", impact: "low",
+        headline: "Yes Bank waives foreign transaction fee on Prosperity Edge for first 6 months from issuance",
+        summary: "Yes Bank is offering a 0% foreign currency markup for the first 6 months to new Prosperity Edge cardholders, targeting frequent international travellers as an acquisition incentive.",
+        tags: ["Yes Bank", "Prosperity Edge", "Forex", "Travel"],
+        source: "Yes Bank Blog", date: "Mar 12, 2025",
+        body: `Yes Bank has introduced a limited-period introductory offer on the Yes Prosperity Edge Credit Card, waiving its standard 3.5% foreign currency transaction markup entirely for the first 6 months from card issuance.
+
+The offer applies to both online international transactions and offline purchases abroad. It is available for cards issued between March 10 and June 30, 2025.
+
+After the introductory period, the standard 3.5% markup applies. The card otherwise earns 4 reward points per ₹200 on international spends.`,
+        highlight: { label: "Acquisition strategy", text: "Forex fee waivers as acquisition hooks are gaining traction. IDFC First Bank ran a similar campaign in 2024 — tracking conversion vs. long-term retention will be key." },
+        url: "#"
+      }
+    ]
+  },
+  {
+    id: "2025-W10",
+    label: "Mar 3 – 9, 2025",
+    isCurrent: false,
+    news: [
+      {
+        id: 201, category: "upi", badge: "badge-upi", badgeLabel: "UPI", impact: "high",
+        headline: "UPI transaction limit raised to ₹5 lakh for credit-linked payments, RBI announces",
+        summary: "RBI has revised the per-transaction limit for credit-line-linked UPI payments from ₹1 lakh to ₹5 lakh effective immediately, unlocking high-value purchase use cases on UPI rails including electronics, travel, and medical.",
+        tags: ["RBI", "UPI", "Credit Line", "Transaction Limit"],
+        source: "RBI Press Release", date: "Mar 6, 2025",
+        body: `The Reserve Bank of India announced on March 6 an increase in the per-transaction limit for payments made via credit lines linked to UPI from ₹1 lakh to ₹5 lakh. The change is effective immediately for all NPCI-approved participants.
+
+The revision is expected to open UPI credit lines for high-ticket purchases such as electronics, travel bookings, and medical expenses — categories that previously fell outside the ₹1 lakh limit.
+
+NPCI confirmed that existing participants (banks and NBFCs in the pilot) will automatically inherit the new limits.`,
+        highlight: { label: "Market shift", text: "At ₹5L, credit-line UPI begins to compete directly with credit card EMI for major purchases. Banks should model potential EMI-to-UPI cannibalization in their high-ticket categories." },
+        url: "#"
+      },
+      {
+        id: 202, category: "industry", badge: "badge-industry", badgeLabel: "Industry", impact: "med",
+        headline: "HDFC Bank overtakes SBI Cards as India's largest credit card issuer with 2.1 crore active cards",
+        summary: "HDFC Bank crossed the 2.1 crore active credit card mark in February 2025, overtaking SBI Cards to reclaim the top issuer position it briefly lost in 2023 amid RBI's pause on new card issuances.",
+        tags: ["HDFC Bank", "SBI Cards", "Market Share"],
+        source: "RBI Monthly Data", date: "Mar 7, 2025",
+        body: `HDFC Bank has reclaimed its position as India's largest credit card issuer, according to the latest RBI card issuance data for February 2025. The bank's active card base stands at 2.12 crore, narrowly ahead of SBI Cards at 2.08 crore.
+
+HDFC had briefly ceded the top position to SBI Cards in 2023 when RBI imposed restrictions on HDFC Bank's digital products after repeated system outages. Those restrictions were lifted in early 2023 and HDFC has been issuing aggressively since.
+
+ICICI Bank follows in third place at 1.78 crore active cards, growing at the fastest rate among the top issuers at 34% year-on-year.`,
+        highlight: { label: "Competitive watch", text: "ICICI's 34% growth rate is the real story. At current trajectory, ICICI closes to within 20 lakh cards of SBI Cards by year-end — reshaping competitive dynamics across the industry." },
+        url: "#"
+      },
+      {
+        id: 203, category: "feature", badge: "badge-feature", badgeLabel: "Feature Change", impact: "low",
+        headline: "Flipkart Axis Bank card enhances SuperCoin earn rate on Myntra to 5 coins per ₹100",
+        summary: "Axis Bank and Flipkart have expanded the SuperCoin earn rate on their co-branded credit card to include Myntra purchases at 5 SuperCoins per ₹100, up from 2, as part of Flipkart Group's loyalty integration push.",
+        tags: ["Axis Bank", "Flipkart", "SuperCoins", "Myntra"],
+        source: "Axis Bank", date: "Mar 5, 2025",
+        body: `The Flipkart Axis Bank Credit Card has received a targeted reward rate enhancement covering purchases made on Myntra. Effective March 5, cardholders earn 5 SuperCoins per ₹100 spent on Myntra, compared to 2 SuperCoins previously.
+
+This change is part of a broader effort by Flipkart Group to unify loyalty currency across its portfolio — Flipkart, Myntra, Cleartrip, and Shopsy.
+
+SuperCoins can be redeemed for discounts on Flipkart and Myntra purchases, and for vouchers from partner brands.`,
+        highlight: { label: "Co-brand strategy", text: "Cross-property loyalty unification (Flipkart + Myntra + Cleartrip on one card currency) mirrors Amazon's global playbook. Worth tracking how redemption behaviour shifts over the next quarter." },
+        url: "#"
+      }
+    ]
+  }
+];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getNextRefreshDate() {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 1 ? 7 : (1 - day + 7) % 7 || 7;
+  const next = new Date(now);
+  next.setDate(now.getDate() + diff);
+  return next.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+const IMPACT_LABELS = { high: "High impact", med: "Medium", low: "Low" };
+
+// ─── Badge ────────────────────────────────────────────────────────────────────
+function Badge({ className, label }) {
+  return React.createElement('span', { className: `badge ${className}` }, label);
+}
+
+// ─── Impact tag ───────────────────────────────────────────────────────────────
+function ImpactTag({ level }) {
+  return React.createElement('span', { className: `impact impact-${level}` }, IMPACT_LABELS[level]);
+}
+
+// ─── News list row ────────────────────────────────────────────────────────────
+function NewsRow({ item, onClick }) {
+  return React.createElement('div', { className: 'news-row', onClick: () => onClick(item) },
+    React.createElement('div', { className: 'row-left' },
+      React.createElement('div', { className: 'row-meta' },
+        React.createElement(Badge, { className: item.badge, label: item.badgeLabel })
+      ),
+      React.createElement('div', { className: 'row-headline' }, item.headline),
+      React.createElement('div', { className: 'row-summary' }, item.summary),
+      React.createElement('div', { className: 'row-footer' },
+        React.createElement('span', { className: 'row-source' }, item.source),
+        ' · ',
+        item.date
+      )
+    ),
+    React.createElement('div', { className: 'row-right' },
+      React.createElement(ImpactTag, { level: item.impact })
+    )
+  );
+}
+
+// ─── Detail page ──────────────────────────────────────────────────────────────
+function DetailPage({ item, onBack }) {
+  const paragraphs = item.body.split('\n\n').filter(Boolean);
+  return React.createElement('div', { className: 'detail-wrap' },
+    React.createElement('button', { className: 'detail-back', onClick: onBack },
+      '← Back to edition'
+    ),
+    React.createElement('div', { className: 'detail-badge-row' },
+      React.createElement(Badge, { className: item.badge, label: item.badgeLabel }),
+      React.createElement(ImpactTag, { level: item.impact })
+    ),
+    React.createElement('h1', { className: 'detail-headline' }, item.headline),
+    React.createElement('div', { className: 'detail-byline' },
+      React.createElement('strong', null, item.source), ` · ${item.date}`
+    ),
+    React.createElement('div', { className: 'detail-body' },
+      paragraphs.map((p, i) => React.createElement('p', { key: i }, p)),
+      item.highlight && React.createElement('div', { className: 'detail-highlight' },
+        React.createElement('div', { className: 'detail-highlight-label' }, item.highlight.label),
+        React.createElement('div', { className: 'detail-highlight-text' }, item.highlight.text)
+      ),
+      React.createElement('a', { href: item.url, className: 'read-more-link' }, 'Read original story →')
+    ),
+    React.createElement('div', { className: 'detail-tags' },
+      item.tags.map(t => React.createElement('span', { key: t, className: 'tag' }, t))
+    )
+  );
+}
+
+// ─── Masthead ─────────────────────────────────────────────────────────────────
+function Masthead({ editionId, onEditionChange, onLogoClick }) {
+  const nextRefresh = getNextRefreshDate();
+  return React.createElement('header', { className: 'masthead' },
+    React.createElement('div', { className: 'masthead-top' },
+      React.createElement('div', { className: 'logo-area' },
+        React.createElement('div', { className: 'logo', onClick: onLogoClick }, 'Pixie', React.createElement('span', null, ' Times')),
+        React.createElement('div', { className: 'logo-tagline' }, 'Credit · Payments · Regulation')
+      ),
+      React.createElement('div', { className: 'masthead-right' },
+        React.createElement('div', { className: 'edition-selector' },
+          React.createElement('span', { className: 'edition-label' }, 'Edition'),
+          React.createElement('select', {
+            className: 'edition-select',
+            value: editionId,
+            onChange: e => onEditionChange(e.target.value)
+          },
+            EDITIONS.map(e => React.createElement('option', { key: e.id, value: e.id },
+              e.isCurrent ? `This week · ${e.label}` : e.label
+            ))
+          )
+        ),
+        React.createElement('div', { className: 'refresh-info' },
+          'Next edition ', React.createElement('strong', null, nextRefresh)
+        )
+      )
+    )
+  );
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+function App() {
+  const [editionId, setEditionId] = useState(EDITIONS[0].id);
+  const [detailItem, setDetailItem] = useState(null);
+
+  const edition = EDITIONS.find(e => e.id === editionId) || EDITIONS[0];
+
+  function handleEditionChange(id) {
+    setEditionId(id);
+    setDetailItem(null);
+  }
+
+  return React.createElement(React.Fragment, null,
+    React.createElement(Masthead, {
+      editionId,
+      onEditionChange: handleEditionChange,
+      onLogoClick: () => setDetailItem(null)
+    }),
+
+    detailItem
+      ? React.createElement(DetailPage, { item: detailItem, onBack: () => setDetailItem(null) })
+      : React.createElement('main', { className: 'page' },
+          React.createElement('div', { className: 'edition-banner' },
+            React.createElement('div', { className: 'edition-title' },
+              edition.isCurrent ? 'This week in credit' : `Edition · ${edition.label}`
+            ),
+            React.createElement('div', { className: 'edition-right' },
+              !edition.isCurrent && React.createElement('span', { className: 'past-chip' }, 'Past edition'),
+              React.createElement('span', { className: 'edition-stories' }, `${edition.news.length} stories`)
+            )
+          ),
+          React.createElement('div', { className: 'news-list' },
+            edition.news.map(item =>
+              React.createElement(NewsRow, { key: item.id, item, onClick: setDetailItem })
+            )
+          )
+        ),
+
+    React.createElement('footer', { className: 'site-footer' },
+      'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
+    )
+  );
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById('root'));
+</script>
+</body>
+</html>
