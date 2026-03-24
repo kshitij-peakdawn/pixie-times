@@ -223,12 +223,9 @@ async function saveEdition(stories) {
 // ── Main handler ───────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   // Allow manual trigger via POST with a secret, plus Vercel cron (GET)
-  if (req.method === "POST") {
-    const secret = req.headers["x-refresh-secret"];
-    if (secret !== process.env.REFRESH_SECRET) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-  }
+  // auth temporarily disabled for launch test
+
+
 
   try {
     console.log("Step 1: Fetching articles from NewsAPI...");
