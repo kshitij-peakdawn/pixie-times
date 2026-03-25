@@ -592,6 +592,23 @@ function App() {
     );
   }
 
+  if (edition && edition.news.length === 0) {
+    return React.createElement(React.Fragment, null,
+      React.createElement(Masthead, { editions, editionId, onEditionChange: handleEditionChange, onLogoClick: () => setDetailItem(null) }),
+      React.createElement('div', { className: 'empty-state' },
+        React.createElement('div', { className: 'empty-title' }, 'Nothing to report this week'),
+        React.createElement('p', null,
+          'No credit card, UPI, or RBI news met our relevance bar this week.',
+          React.createElement('br'),
+          'Check back next Monday for a fresh edition.'
+        )
+      ),
+      React.createElement('footer', { className: 'site-footer' },
+        'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
+      )
+    );
+  }
+
   return React.createElement(React.Fragment, null,
     React.createElement(Masthead, {
       editions,
