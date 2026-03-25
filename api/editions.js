@@ -1,27 +1,37 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "redis";
+
+let client;
+async function getClient() {
+  if (!client) {
+    client = createClient({ url: process.env.REDIS_URL });
+    client.on("error", (err) => console.error("Redis error:", err));
+    await client.connect();
+  }
+  return client;
+}
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    // Get the list of edition IDs (newest first)
-    const index = await kv.get("editions:index");
+    const redis = await getClient();
 
-    if (!index || index.length === 0) {
-      return res.status(200).json({ editions: [] });
-    }
+    const raw = await redis.get("editions:index");
+    if (!raw) return res.status(200).json({ editions: [] });
 
-    // Fetch all editions in parallel
+    const index = JSON.parse(raw);
+    if (!index.length) return res.status(200).json({ editions: [] });
+
     const editions = await Promise.all(
-      index.map((id) => kv.get(`edition:${id}`))
+      index.map(async (id) => {
+        const data = await redis.get(`edition:${id}`);
+        return data ? JSON.parse(data) : null;
+      })
     );
 
-    // Filter out any nulls (safety check)
-    const valid = editions.filter(Boolean);
-
-    return res.status(200).json({ editions: valid });
+    return res.status(200).json({ editions: editions.filter(Boolean) });
   } catch (err) {
     console.error("editions error:", err);
-    return res.status(500).json({ error: "Failed to load editions" });
+    return res.status(500).json({ error: err.message });
   }
 }
