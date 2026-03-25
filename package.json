@@ -2,6 +2,6 @@
   "name": "pixie-times",
   "version": "1.0.0",
   "dependencies": {
-    "@vercel/kv": "^1.0.0"
+    "redis": "^4.6.0"
   }
 }
