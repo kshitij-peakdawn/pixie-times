@@ -1,16 +1,18 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "redis";
 
-// ── Constants ──────────────────────────────────────────────────────────────
+let client;
+async function getClient() {
+  if (!client) {
+    client = createClient({ url: process.env.REDIS_URL });
+    client.on("error", (err) => console.error("Redis error:", err));
+    await client.connect();
+  }
+  return client;
+}
+
 const MAX_EDITIONS = 3;
 const MAX_STORIES = 10;
 
-// NewsAPI sources focused on Indian finance publications
-const NEWS_SOURCES = [
-  "the-times-of-india",
-  "the-hindu",
-].join(",");
-
-// Search queries to run — results get merged and deduplicated by Claude
 const SEARCH_QUERIES = [
   "credit card India",
   "RBI credit card guidelines",
@@ -19,21 +21,19 @@ const SEARCH_QUERIES = [
   "credit card reward fees India",
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────
 function getWeekId(date) {
-  // Returns ISO week string like "2025-W14"
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const week1 = new Date(d.getFullYear(), 0, 4);
-  const weekNum = Math.round(
-    ((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
-  ) + 1;
+  const weekNum =
+    Math.round(
+      ((d - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
+    ) + 1;
   return `${d.getFullYear()}-W${String(weekNum).padStart(2, "0")}`;
 }
 
 function getEditionLabel(date) {
-  // "Mar 17 – 23, 2025"
   const d = new Date(date);
   const day = d.getDay();
   const monday = new Date(d);
@@ -45,7 +45,6 @@ function getEditionLabel(date) {
   return `${fmt(monday)} – ${fmt(sunday)}, ${sunday.getFullYear()}`;
 }
 
-// ── Step 1: Fetch raw articles from NewsAPI ────────────────────────────────
 async function fetchArticles() {
   const apiKey = process.env.NEWS_API_KEY;
   const oneWeekAgo = new Date();
@@ -66,15 +65,12 @@ async function fetchArticles() {
     try {
       const res = await fetch(url.toString());
       const data = await res.json();
-      if (data.articles) {
-        allArticles.push(...data.articles);
-      }
+      if (data.articles) allArticles.push(...data.articles);
     } catch (err) {
-      console.error(`Failed to fetch query "${query}":`, err.message);
+      console.error(`Failed query "${query}":`, err.message);
     }
   }
 
-  // Remove articles with no description and deduplicate by URL
   const seen = new Set();
   return allArticles.filter((a) => {
     if (!a.description || !a.url || seen.has(a.url)) return false;
@@ -83,9 +79,7 @@ async function fetchArticles() {
   });
 }
 
-// ── Step 2: Send articles to Claude for processing ─────────────────────────
 async function processWithClaude(articles) {
-  // Format articles for the prompt
   const articleList = articles
     .map(
       (a, i) =>
@@ -101,7 +95,7 @@ DATE: ${a.publishedAt}`
 
 Below is a raw list of news articles collected this week. Your job is to:
 
-1. DEDUPLICATE — if multiple articles cover the same event or story, treat them as one story. Pick the best source to cite (prefer: Economic Times, Livemint, Business Standard, Financial Express, Hindu BusinessLine in that order).
+1. DEDUPLICATE — if multiple articles cover the same event, treat them as one story. Pick the best source to cite (prefer: Economic Times, Livemint, Business Standard, Financial Express, Hindu BusinessLine in that order).
 
 2. FILTER — keep only articles relevant to:
    - New credit card launches in India
@@ -116,29 +110,27 @@ Below is a raw list of news articles collected this week. Your job is to:
    - med = meaningful change for a segment of users
    - low = minor update or niche relevance
 
-5. OUTPUT up to ${MAX_STORIES} stories as a JSON array. No more than ${MAX_STORIES}.
+5. OUTPUT up to ${MAX_STORIES} stories as a JSON array sorted by impact (high first) then recency.
 
 For each story output this exact JSON shape:
 {
-  "id": <number, starting from 1>,
+  "id": <number starting from 1>,
   "category": "<launch|feature|fee|rbi|upi|industry>",
   "badge": "badge-<category>",
   "badgeLabel": "<New Launch|Feature Change|Fee Change|RBI Guideline|UPI|Industry>",
   "impact": "<high|med|low>",
-  "headline": "<clear, factual headline under 15 words>",
+  "headline": "<clear factual headline under 15 words>",
   "summary": "<2 sentences max, plain English, what happened and why it matters>",
-  "description": "<the original description from the source article, verbatim>",
+  "description": "<the original description from the source article verbatim>",
   "tags": ["<tag1>", "<tag2>", "<tag3>"],
   "source": "<publication name>",
   "sourceUrl": "<original article URL>",
-  "date": "<formatted as 'Mar 18, 2025'>",
+  "date": "<formatted as Mon DD, YYYY>",
   "highlight": {
     "label": "Why it matters for your team",
-    "text": "<2-3 sentences of sharp, specific analysis for product/design/business professionals in the credit card industry. Be concrete, not generic.>"
+    "text": "<2-3 sentences of sharp specific analysis for product/design/business professionals in the credit card industry>"
   }
 }
-
-Sort stories by impact (high first), then by recency.
 
 Return ONLY the JSON array. No explanation, no markdown, no preamble.
 
@@ -162,8 +154,6 @@ ${articleList}`;
 
   const data = await response.json();
   const text = data.content?.[0]?.text || "[]";
-
-  // Strip markdown code fences if present
   const clean = text.replace(/```json|```/g, "").trim();
 
   try {
@@ -174,8 +164,8 @@ ${articleList}`;
   }
 }
 
-// ── Step 3: Save edition to KV ─────────────────────────────────────────────
 async function saveEdition(stories) {
+  const redis = await getClient();
   const now = new Date();
   const id = getWeekId(now);
   const label = getEditionLabel(now);
@@ -188,45 +178,43 @@ async function saveEdition(stories) {
     news: stories,
   };
 
-  // Get existing index
-  let index = (await kv.get("editions:index")) || [];
+  const raw = await redis.get("editions:index");
+  let index = raw ? JSON.parse(raw) : [];
 
   // Mark previous editions as not current
   for (const existingId of index) {
-    const existing = await kv.get(`edition:${existingId}`);
-    if (existing && existing.isCurrent) {
-      await kv.set(`edition:${existingId}`, { ...existing, isCurrent: false });
+    const existingRaw = await redis.get(`edition:${existingId}`);
+    if (existingRaw) {
+      const existing = JSON.parse(existingRaw);
+      if (existing.isCurrent) {
+        await redis.set(
+          `edition:${existingId}`,
+          JSON.stringify({ ...existing, isCurrent: false })
+        );
+      }
     }
   }
 
-  // Remove current id if it already exists (re-run scenario)
+  // Remove if re-running same week
   index = index.filter((i) => i !== id);
-
-  // Prepend new edition
   index.unshift(id);
 
   // Keep only MAX_EDITIONS, delete oldest
   if (index.length > MAX_EDITIONS) {
     const toDelete = index.splice(MAX_EDITIONS);
     for (const oldId of toDelete) {
-      await kv.del(`edition:${oldId}`);
+      await redis.del(`edition:${oldId}`);
     }
   }
 
-  // Save
-  await kv.set(`edition:${id}`, edition);
-  await kv.set("editions:index", index);
+  await redis.set(`edition:${id}`, JSON.stringify(edition));
+  await redis.set("editions:index", JSON.stringify(index));
 
   return edition;
 }
 
-// ── Main handler ───────────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  // Allow manual trigger via POST with a secret, plus Vercel cron (GET)
   // auth temporarily disabled for launch test
-
-
-
   try {
     console.log("Step 1: Fetching articles from NewsAPI...");
     const articles = await fetchArticles();
@@ -240,7 +228,7 @@ export default async function handler(req, res) {
     const stories = await processWithClaude(articles);
     console.log(`Claude produced ${stories.length} stories`);
 
-    console.log("Step 3: Saving to KV...");
+    console.log("Step 3: Saving to Redis...");
     const edition = await saveEdition(stories);
 
     return res.status(200).json({
