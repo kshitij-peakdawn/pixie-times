@@ -13,14 +13,64 @@ async function getClient() {
 const MAX_EDITIONS = 3;
 const MAX_STORIES = 10;
 
-const SEARCH_QUERIES = [
-  "credit card India",
-  "RBI credit card guidelines",
-  "UPI credit line India",
-  "credit card launch India bank",
-  "credit card reward fees India",
+// ── RSS feeds from Indian financial publications (no API key needed) ────────
+const RSS_FEEDS = [
+  {
+    name: "Economic Times",
+    url: "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
+  },
+  {
+    name: "Economic Times Banking",
+    url: "https://economictimes.indiatimes.com/industry/banking/finance/banking/rssfeeds/13358259.cms",
+  },
+  {
+    name: "Business Standard",
+    url: "https://www.business-standard.com/rss/finance/news-10301.rss",
+  },
+  {
+    name: "Livemint",
+    url: "https://www.livemint.com/rss/money",
+  },
+  {
+    name: "Financial Express",
+    url: "https://www.financialexpress.com/market/rss",
+  },
+  {
+    name: "Hindu BusinessLine",
+    url: "https://www.thehindubusinessline.com/money-and-banking/feeder/default.rss",
+  },
 ];
 
+// Keywords to filter relevant articles before sending to Claude
+const RELEVANT_KEYWORDS = [
+  "credit card",
+  "debit card",
+  "rbi",
+  "reserve bank",
+  "upi",
+  "unified payment",
+  "credit line",
+  "rupay",
+  "cashback",
+  "reward point",
+  "lounge access",
+  "annual fee",
+  "joining fee",
+  "hdfc card",
+  "sbi card",
+  "icici card",
+  "axis card",
+  "amex",
+  "american express",
+  "mastercard",
+  "visa card",
+  "npci",
+  "payment network",
+  "card launch",
+  "card benefit",
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
 function getWeekId(date) {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
@@ -45,40 +95,84 @@ function getEditionLabel(date) {
   return `${fmt(monday)} – ${fmt(sunday)}, ${sunday.getFullYear()}`;
 }
 
+// ── Parse RSS XML manually (no external library needed) ───────────────────
+function parseRSS(xml, sourceName) {
+  const articles = [];
+  const items = xml.match(/<item>([\s\S]*?)<\/item>/g) || [];
+
+  for (const item of items) {
+    const get = (tag) => {
+      const match = item.match(new RegExp(`<${tag}[^>]*><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>|<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
+      return match ? (match[1] || match[2] || "").trim() : "";
+    };
+
+    const title = get("title");
+    const description = get("description").replace(/<[^>]+>/g, "").trim();
+    const url = get("link") || get("guid");
+    const pubDate = get("pubDate");
+
+    if (!title || !url) continue;
+
+    articles.push({
+      source: { name: sourceName },
+      title,
+      description: description || title,
+      url,
+      publishedAt: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+    });
+  }
+
+  return articles;
+}
+
+// ── Step 1: Fetch articles from RSS feeds ─────────────────────────────────
 async function fetchArticles() {
-  const apiKey = process.env.NEWS_API_KEY;
+  const allArticles = [];
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-  const from = oneWeekAgo.toISOString().split("T")[0];
 
-  const allArticles = [];
-
-  for (const query of SEARCH_QUERIES) {
-    const url = new URL("https://newsapi.org/v2/everything");
-    url.searchParams.set("q", query);
-    url.searchParams.set("from", from);
-    url.searchParams.set("language", "en");
-    url.searchParams.set("sortBy", "relevancy");
-    url.searchParams.set("pageSize", "20");
-    url.searchParams.set("apiKey", apiKey);
-
+  for (const feed of RSS_FEEDS) {
     try {
-      const res = await fetch(url.toString());
-      const data = await res.json();
-      if (data.articles) allArticles.push(...data.articles);
+      const res = await fetch(feed.url, {
+        headers: { "User-Agent": "PixieTimes/1.0 RSS Reader" },
+        signal: AbortSignal.timeout(8000),
+      });
+
+      if (!res.ok) {
+        console.log(`Feed ${feed.name} returned ${res.status}`);
+        continue;
+      }
+
+      const xml = await res.text();
+      const articles = parseRSS(xml, feed.name);
+      console.log(`${feed.name}: ${articles.length} articles`);
+      allArticles.push(...articles);
     } catch (err) {
-      console.error(`Failed query "${query}":`, err.message);
+      console.error(`Failed to fetch ${feed.name}:`, err.message);
     }
   }
 
+  // Filter by date (last 7 days) and keyword relevance
   const seen = new Set();
   return allArticles.filter((a) => {
-    if (!a.description || !a.url || seen.has(a.url)) return false;
+    if (!a.url || seen.has(a.url)) return false;
     seen.add(a.url);
-    return true;
+
+    // Date filter
+    try {
+      const pubDate = new Date(a.publishedAt);
+      if (pubDate < oneWeekAgo) return false;
+    } catch {
+      // keep if date is unparseable
+    }
+
+    // Keyword filter — must contain at least one relevant keyword
+    const text = `${a.title} ${a.description}`.toLowerCase();
+    return RELEVANT_KEYWORDS.some((kw) => text.includes(kw));
   });
 }
 
+// ── Step 2: Process with Claude ────────────────────────────────────────────
 async function processWithClaude(articles) {
   const articleList = articles
     .map(
@@ -93,15 +187,16 @@ DATE: ${a.publishedAt}`
 
   const prompt = `You are the editor of Pixie Times, a weekly news briefing for Product, Design, and Business professionals working in India's credit card industry.
 
-Below is a raw list of news articles collected this week. Your job is to:
+Below is a raw list of news articles collected this week from Indian financial publications. Your job is to:
 
 1. DEDUPLICATE — if multiple articles cover the same event, treat them as one story. Pick the best source to cite (prefer: Economic Times, Livemint, Business Standard, Financial Express, Hindu BusinessLine in that order).
 
-2. FILTER — keep only articles relevant to:
+2. FILTER — keep only articles directly relevant to:
    - New credit card launches in India
    - Changes to existing credit cards (rewards, features, fees, lounge access, etc.)
    - RBI guidelines on credit cards, UPI, or credit line on UPI
    - Industry news relevant to India's credit card market
+   Discard anything not directly relevant to these topics.
 
 3. CATEGORISE each story as exactly one of: launch, feature, fee, rbi, upi, industry
 
@@ -132,6 +227,7 @@ For each story output this exact JSON shape:
   }
 }
 
+If there are genuinely no relevant articles, return an empty array [].
 Return ONLY the JSON array. No explanation, no markdown, no preamble.
 
 HERE ARE THE ARTICLES:
@@ -164,6 +260,7 @@ ${articleList}`;
   }
 }
 
+// ── Step 3: Save to Redis ──────────────────────────────────────────────────
 async function saveEdition(stories) {
   const redis = await getClient();
   const now = new Date();
@@ -195,11 +292,9 @@ async function saveEdition(stories) {
     }
   }
 
-  // Remove if re-running same week
   index = index.filter((i) => i !== id);
   index.unshift(id);
 
-  // Keep only MAX_EDITIONS, delete oldest
   if (index.length > MAX_EDITIONS) {
     const toDelete = index.splice(MAX_EDITIONS);
     for (const oldId of toDelete) {
@@ -213,15 +308,16 @@ async function saveEdition(stories) {
   return edition;
 }
 
+// ── Main handler ───────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   // auth temporarily disabled for launch test
   try {
-    console.log("Step 1: Fetching articles from NewsAPI...");
+    console.log("Step 1: Fetching articles from RSS feeds...");
     const articles = await fetchArticles();
-    console.log(`Fetched ${articles.length} raw articles`);
+    console.log(`Fetched ${articles.length} relevant articles after filtering`);
 
     if (articles.length === 0) {
-      return res.status(200).json({ message: "No articles found", stories: 0 });
+      return res.status(200).json({ message: "No relevant articles found this week", stories: 0 });
     }
 
     console.log("Step 2: Processing with Claude...");
