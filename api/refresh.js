@@ -17,14 +17,14 @@ const MAX_STORIES = 10;
 const RSS_FEEDS = [
   {
     name: "Economic Times",
-    url: "https://economictimes.indiatimes.com/markets/rssfeeds/1977021501.cms",
-  },
-  {
-    name: "Economic Times Banking",
     url: "https://economictimes.indiatimes.com/industry/banking/finance/banking/rssfeeds/13358259.cms",
   },
   {
-    name: "Business Standard",
+    name: "Economic Times Fintech",
+    url: "https://economictimes.indiatimes.com/tech/technology/rssfeeds/13357270.cms",
+  },
+  {
+    name: "Business Standard Banking",
     url: "https://www.business-standard.com/rss/finance/news-10301.rss",
   },
   {
@@ -39,6 +39,10 @@ const RSS_FEEDS = [
     name: "Hindu BusinessLine",
     url: "https://www.thehindubusinessline.com/money-and-banking/feeder/default.rss",
   },
+  {
+    name: "Hindu BusinessLine Cards",
+    url: "https://www.thehindubusinessline.com/topic/credit-cards/feeder/default.rss",
+  },
 ];
 
 // Keywords to filter relevant articles before sending to Claude
@@ -52,24 +56,31 @@ const RELEVANT_KEYWORDS = [
   "credit line",
   "rupay",
   "cashback",
-  "reward point",
-  "lounge access",
+  "reward",
+  "lounge",
   "annual fee",
   "joining fee",
-  "hdfc card",
-  "sbi card",
-  "icici card",
-  "axis card",
-  "amex",
-  "american express",
-  "mastercard",
-  "visa card",
-  "npci",
-  "payment network",
   "card launch",
   "card benefit",
+  "card limit",
+  "payment network",
+  "npci",
+  "fintech",
+  "digital payment",
+  "emi",
+  "card fraud",
+  "contactless",
+  "tokenisation",
+  "prepaid card",
+  "wallet",
+  "buy now pay later",
+  "bnpl",
+  "co-brand",
+  "cobrand",
+  "amex",
+  "mastercard",
+  "visa",
 ];
-
 // ── Helpers ────────────────────────────────────────────────────────────────
 function getWeekId(date) {
   const d = new Date(date);
