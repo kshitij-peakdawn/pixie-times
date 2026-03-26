@@ -10,7 +10,7 @@ async function getClient() {
   return client;
 }
 
-const MAX_EDITIONS = 3;
+const MAX_EDITIONS = 10;
 const MAX_STORIES = 10;
 
 // ── RSS feeds from Indian financial publications (no API key needed) ────────
