@@ -46,8 +46,7 @@
   .masthead-controls { display: flex; align-items: center; gap: 8px; }
   .edition-selector { display: flex; align-items: center; gap: 7px; }
   .edition-label { font-size: 0.7rem; color: var(--ink-muted); font-weight: 500; white-space: nowrap; }
-  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: 200px; }
-  .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: none; }  .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
   .refresh-info { font-size: 0.67rem; color: var(--ink-faint); }
   .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
 
@@ -196,7 +195,7 @@
     .row-right { display: none; }
     .page { padding: 1.25rem 1rem 3rem; }
     .detail-wrap { padding: 1.25rem 1rem 3rem; }
-    .edition-select { max-width: 120px; }
+    .edition-select { max-width: none; }
     .search-input { width: 140px; }
     .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   }
@@ -528,7 +527,7 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
                     onChange: e => onEditionChange(e.target.value)
                   },
                     editions.map(e => React.createElement('option', { key: e.id, value: e.id },
-                      e.isCurrent ? `This week · ${e.label}` : e.label
+                      e.label
                     ))
                   )
                 )
@@ -543,16 +542,12 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
 }
 
 // ── Footer ────────────────────────────────────────────────────────────────────
-function Footer({ onSubscribe, onUnsubscribe }) {
+function Footer({ onSubscribe }) {
   return React.createElement('footer', { className: 'site-footer' },
     React.createElement('div', { className: 'footer-inner' },
       React.createElement('div', { className: 'footer-left' },
         React.createElement('div', { className: 'footer-copy' },
           'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
-        ),
-        React.createElement('div', { className: 'footer-unsub' },
-          'Already subscribed? ',
-          React.createElement('a', { onClick: onUnsubscribe }, 'Unsubscribe')
         )
       ),
       React.createElement('div', { className: 'footer-subscribe' },
@@ -564,7 +559,6 @@ function Footer({ onSubscribe, onUnsubscribe }) {
     )
   );
 }
-
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   const [editions, setEditions] = useState([]);
@@ -574,7 +568,6 @@ function App() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSubscribe, setShowSubscribe] = useState(false);
-  const [showUnsubscribe, setShowUnsubscribe] = useState(false);
   const [toast, setToast] = useState('');
 
   async function loadEditions() {
@@ -609,12 +602,10 @@ function App() {
 
   const footer = React.createElement(Footer, {
     onSubscribe: () => setShowSubscribe(true),
-    onUnsubscribe: () => setShowUnsubscribe(true),
   });
 
   const modals = React.createElement(React.Fragment, null,
     showSubscribe && React.createElement(SubscribeModal, { onClose: () => setShowSubscribe(false), onSuccess: showToast }),
-    showUnsubscribe && React.createElement(UnsubscribeModal, { onClose: () => setShowUnsubscribe(false), onSuccess: showToast }),
     toast && React.createElement(Toast, { message: toast })
   );
 
