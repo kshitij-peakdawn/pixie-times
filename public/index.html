@@ -31,218 +31,73 @@
     --font-body: 'DM Sans', system-ui, sans-serif;
   }
 
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; }
 
   /* ── Masthead ── */
-  .masthead {
-    border-bottom: 3px double var(--ink);
-    position: sticky;
-    top: 0;
-    background: var(--paper);
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(26,18,8,0.06);
-  }
-  .masthead-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.8rem 2rem 0.8rem;
-    gap: 1rem;
-  }
+  .masthead { border-bottom: 3px double var(--ink); position: sticky; top: 0; background: var(--paper); z-index: 100; box-shadow: 0 2px 12px rgba(26,18,8,0.06); }
+  .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 2rem; gap: 1rem; }
   .logo-area { display: flex; align-items: baseline; gap: 0.55rem; }
-  .logo {
-    font-family: var(--font-display);
-    font-size: clamp(1.7rem, 5vw, 2.5rem);
-    font-weight: 700;
-    color: var(--ink);
-    letter-spacing: -0.02em;
-    line-height: 1;
-    cursor: pointer;
-    user-select: none;
-  }
+  .logo { font-family: var(--font-display); font-size: clamp(1.7rem, 5vw, 2.5rem); font-weight: 700; color: var(--ink); letter-spacing: -0.02em; line-height: 1; cursor: pointer; user-select: none; }
   .logo span { color: var(--accent); }
-  .logo-tagline {
-    font-size: 0.68rem;
-    color: var(--ink-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-weight: 500;
-    display: none;
-  }
+  .logo-tagline { font-size: 0.68rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 500; display: none; }
   @media (min-width: 500px) { .logo-tagline { display: block; } }
 
-  .masthead-right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
-    flex-shrink: 0;
-  }
+  .masthead-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+  .masthead-controls { display: flex; align-items: center; gap: 8px; }
   .edition-selector { display: flex; align-items: center; gap: 7px; }
   .edition-label { font-size: 0.7rem; color: var(--ink-muted); font-weight: 500; white-space: nowrap; }
-  .edition-select {
-    font-family: var(--font-body);
-    font-size: 0.72rem;
-    color: var(--ink);
-    background: var(--paper-warm);
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    padding: 3px 24px 3px 8px;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 7px center;
-    cursor: pointer;
-    font-weight: 500;
-    max-width: 200px;
-  }
+  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: 200px; }
   .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
   .refresh-info { font-size: 0.67rem; color: var(--ink-faint); }
   .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
 
-  /* ── Page layout ── */
+  /* ── Search ── */
+  .search-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--rule); border-radius: 4px; padding: 4px 10px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500; color: var(--ink-muted); cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; white-space: nowrap; flex-shrink: 0; }
+  .search-btn:hover { background: var(--paper-warm); border-color: var(--ink-faint); color: var(--ink); }
+  .search-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .search-bar { display: flex; align-items: center; gap: 6px; animation: searchExpand 0.18s ease both; flex-shrink: 0; }
+  @keyframes searchExpand { from { opacity: 0; transform: scaleX(0.85); transform-origin: right; } to { opacity: 1; transform: scaleX(1); } }
+  .search-input { font-family: var(--font-body); font-size: 0.8rem; color: var(--ink); background: var(--paper-card); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 10px; width: 200px; outline: none; transition: border-color 0.12s; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-close { background: none; border: none; cursor: pointer; color: var(--ink-faint); font-size: 1rem; line-height: 1; padding: 2px 4px; transition: color 0.12s; flex-shrink: 0; }
+  .search-close:hover { color: var(--ink); }
+
+  /* ── Page ── */
   .page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; }
 
-  /* ── Loading / error states ── */
-  .state-center {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 4rem 1.5rem;
-    text-align: center;
-    color: var(--ink-muted);
-  }
-  .state-center .spinner {
-    width: 28px; height: 28px;
-    border: 2px solid var(--rule);
-    border-top-color: var(--ink-muted);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin: 0 auto 1rem;
-  }
+  /* ── States ── */
+  .state-center { max-width: 820px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; color: var(--ink-muted); }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--rule); border-top-color: var(--ink-muted); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .state-center .error-icon { font-size: 1.5rem; margin-bottom: 0.75rem; }
   .state-center p { font-size: 0.88rem; line-height: 1.6; }
-  .state-center .retry-btn {
-    margin-top: 1rem;
-    background: none;
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    padding: 0.45rem 1rem;
-    font-family: var(--font-body);
-    font-size: 0.8rem;
-    color: var(--ink-muted);
-    cursor: pointer;
-    transition: background 0.12s;
-  }
-  .state-center .retry-btn:hover { background: var(--paper-warm); }
-
-  /* ── Empty state ── */
-  .empty-state {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-    text-align: center;
-  }
+  .retry-btn { margin-top: 1rem; background: none; border: 1px solid var(--rule); border-radius: 4px; padding: 0.45rem 1rem; font-family: var(--font-body); font-size: 0.8rem; color: var(--ink-muted); cursor: pointer; transition: background 0.12s; }
+  .retry-btn:hover { background: var(--paper-warm); }
+  .empty-state { max-width: 820px; margin: 0 auto; padding: 3rem 1.5rem; text-align: center; }
   .empty-state p { font-size: 0.88rem; color: var(--ink-muted); line-height: 1.7; }
-  .empty-state .empty-title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    color: var(--ink);
-    margin-bottom: 0.5rem;
-  }
+  .empty-title { font-family: var(--font-display); font-size: 1.1rem; color: var(--ink); margin-bottom: 0.5rem; }
 
   /* ── Edition banner ── */
-  .edition-banner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.4rem;
-    padding-bottom: 0.8rem;
-    border-bottom: 1px solid var(--rule);
-    gap: 0.75rem;
-  }
-  .edition-title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--ink);
-  }
+  .edition-banner { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--rule); gap: 0.75rem; }
+  .edition-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
   .edition-right { display: flex; align-items: center; gap: 8px; }
   .edition-stories { font-size: 0.7rem; color: var(--ink-faint); }
-  .past-chip {
-    display: inline-block;
-    background: var(--gold-light);
-    border: 1px solid #e8d090;
-    color: var(--gold);
-    border-radius: 4px;
-    font-size: 0.65rem;
-    font-weight: 500;
-    padding: 2px 8px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
+  .past-chip { display: inline-block; background: var(--gold-light); border: 1px solid #e8d090; color: var(--gold); border-radius: 4px; font-size: 0.65rem; font-weight: 500; padding: 2px 8px; letter-spacing: 0.05em; text-transform: uppercase; }
 
   /* ── News list ── */
   .news-list { display: flex; flex-direction: column; }
-
-  /* ── News row ── */
-  .news-row {
-    display: flex;
-    align-items: flex-start;
-    padding: 1.05rem 0.5rem;
-    border-bottom: 1px solid var(--paper-warm);
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 0 -0.5rem;
-    transition: background 0.1s;
-  }
+  .news-row { display: flex; align-items: flex-start; padding: 1.05rem 0.5rem; border-bottom: 1px solid var(--paper-warm); cursor: pointer; border-radius: 5px; margin: 0 -0.5rem; transition: background 0.1s; }
   .news-row:last-child { border-bottom: none; }
   .news-row:hover { background: var(--paper-card); }
-
   .row-left { flex: 1; min-width: 0; }
   .row-right { flex-shrink: 0; padding-left: 1.25rem; padding-top: 3px; }
-
-  .row-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 0.3rem; }
-  .row-headline {
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.35;
-    color: var(--ink);
-    margin-bottom: 0.3rem;
-  }
-  .row-summary {
-    font-size: 0.82rem;
-    color: var(--ink-muted);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-bottom: 0.4rem;
-  }
+  .row-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 0.3rem; flex-wrap: wrap; }
+  .row-headline { font-family: var(--font-display); font-size: 1rem; font-weight: 600; line-height: 1.35; color: var(--ink); margin-bottom: 0.3rem; }
+  .row-summary { font-size: 0.82rem; color: var(--ink-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.4rem; }
   .row-footer { font-size: 0.68rem; color: var(--ink-faint); }
   .row-source { font-weight: 500; color: var(--ink-muted); }
 
   /* ── Badge ── */
-  .badge {
-    display: inline-block;
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    border-radius: 3px;
-    padding: 2px 6px;
-    white-space: nowrap;
-  }
+  .badge { display: inline-block; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; border-radius: 3px; padding: 2px 6px; white-space: nowrap; }
   .badge-launch   { background: var(--badge-launch-bg);   color: var(--badge-launch); }
   .badge-feature  { background: var(--badge-feature-bg);  color: var(--badge-feature); }
   .badge-rbi      { background: var(--badge-rbi-bg);      color: var(--badge-rbi); }
@@ -251,129 +106,80 @@
   .badge-industry { background: var(--badge-industry-bg); color: var(--badge-industry); }
 
   /* ── Impact ── */
-  .impact {
-    font-size: 0.6rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 2px 6px;
-    border-radius: 3px;
-    white-space: nowrap;
-  }
+  .impact { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
   .impact-high { background: #ffeaea; color: #991a1a; }
   .impact-med  { background: #fff6e0; color: #8c5c00; }
   .impact-low  { background: #eaf5ea; color: #276127; }
 
   /* ── Detail page ── */
-  .detail-wrap {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem 4rem;
-    animation: fadeUp 0.2s ease both;
-  }
-  .detail-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.78rem;
-    color: var(--ink-muted);
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: var(--font-body);
-    padding: 0;
-    margin-bottom: 1.75rem;
-    transition: color 0.12s;
-  }
+  .detail-wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; animation: fadeUp 0.2s ease both; }
+  .detail-back { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--ink-muted); cursor: pointer; border: none; background: none; font-family: var(--font-body); padding: 0; margin-bottom: 1.75rem; transition: color 0.12s; }
   .detail-back:hover { color: var(--accent); }
   .detail-badge-row { display: flex; align-items: center; gap: 7px; margin-bottom: 0.85rem; flex-wrap: wrap; }
-  .detail-headline {
-    font-family: var(--font-display);
-    font-size: clamp(1.35rem, 4vw, 1.8rem);
-    font-weight: 700;
-    line-height: 1.25;
-    color: var(--ink);
-    margin-bottom: 0.75rem;
-  }
-  .detail-byline {
-    font-size: 0.75rem;
-    color: var(--ink-faint);
-    padding-bottom: 1.2rem;
-    border-bottom: 1px solid var(--rule);
-    margin-bottom: 1.5rem;
-  }
+  .detail-headline { font-family: var(--font-display); font-size: clamp(1.35rem, 4vw, 1.8rem); font-weight: 700; line-height: 1.25; color: var(--ink); margin-bottom: 0.75rem; }
+  .detail-byline { font-size: 0.75rem; color: var(--ink-faint); padding-bottom: 1.2rem; border-bottom: 1px solid var(--rule); margin-bottom: 1.5rem; }
   .detail-byline strong { color: var(--ink-muted); font-weight: 500; }
-
-  .detail-description {
-    font-size: 0.93rem;
-    line-height: 1.75;
-    color: var(--ink);
-    margin-bottom: 1.5rem;
-  }
-
-  .detail-highlight {
-    background: var(--paper-warm);
-    border-left: 3px solid var(--accent);
-    padding: 0.85rem 1.1rem;
-    border-radius: 0 5px 5px 0;
-    margin-bottom: 1.5rem;
-  }
-  .detail-highlight-label {
-    font-size: 0.63rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--accent);
-    margin-bottom: 0.3rem;
-    font-family: var(--font-body);
-  }
+  .detail-description { font-size: 0.93rem; line-height: 1.75; color: var(--ink); margin-bottom: 1.5rem; }
+  .detail-highlight { background: var(--paper-warm); border-left: 3px solid var(--accent); padding: 0.85rem 1.1rem; border-radius: 0 5px 5px 0; margin-bottom: 1.5rem; }
+  .detail-highlight-label { font-size: 0.63rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.3rem; }
   .detail-highlight-text { font-size: 0.87rem; color: var(--ink); line-height: 1.65; }
-
-  .read-more-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--accent);
-    font-size: 0.85rem;
-    font-weight: 500;
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent-border);
-    padding-bottom: 1px;
-    transition: opacity 0.12s;
-  }
+  .read-more-link { display: inline-flex; align-items: center; gap: 5px; color: var(--accent); font-size: 0.85rem; font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--accent-border); padding-bottom: 1px; transition: opacity 0.12s; }
   .read-more-link:hover { opacity: 0.75; }
+  .detail-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 1.75rem; padding-top: 1.1rem; border-top: 1px solid var(--rule); }
+  .tag { font-size: 0.68rem; background: var(--paper-warm); color: var(--ink-muted); border-radius: 3px; padding: 2px 8px; }
 
-  .detail-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 1.75rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid var(--rule);
-  }
-  .tag {
-    font-size: 0.68rem;
-    background: var(--paper-warm);
-    color: var(--ink-muted);
-    border-radius: 3px;
-    padding: 2px 8px;
-  }
+  /* ── Search results ── */
+  .search-page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; }
+  .search-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--rule); gap: 0.75rem; flex-wrap: wrap; }
+  .search-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+  .search-title em { color: var(--accent); font-style: normal; }
+  .search-count { font-size: 0.7rem; color: var(--ink-faint); }
+  .search-edition-tag { font-size: 0.65rem; background: var(--paper-warm); color: var(--ink-muted); border-radius: 3px; padding: 2px 6px; margin-left: 6px; }
+  .search-empty { text-align: center; padding: 3rem 1rem; color: var(--ink-muted); font-size: 0.88rem; }
+  .search-empty-title { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin-bottom: 0.4rem; }
 
   /* ── Footer ── */
-  .site-footer {
-    text-align: center;
-    border-top: 1px solid var(--rule);
-    padding: 1.5rem;
-    font-size: 0.7rem;
-    color: var(--ink-faint);
-    letter-spacing: 0.03em;
-  }
+  .site-footer { border-top: 1px solid var(--rule); padding: 1.5rem 2rem; font-size: 0.72rem; color: var(--ink-faint); }
+  .footer-inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .footer-left { display: flex; flex-direction: column; gap: 3px; }
+  .footer-copy { letter-spacing: 0.03em; }
+  .footer-unsub { font-size: 0.68rem; color: var(--ink-faint); }
+  .footer-unsub a { color: var(--ink-faint); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+  .footer-unsub a:hover { color: var(--ink-muted); }
+  .footer-subscribe { display: flex; align-items: center; gap: 10px; }
+  .footer-subscribe-text { font-size: 0.75rem; color: var(--ink-muted); }
+  .subscribe-cta { background: var(--ink); color: var(--paper); border: none; border-radius: 4px; padding: 5px 14px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500; cursor: pointer; transition: opacity 0.12s; white-space: nowrap; }
+  .subscribe-cta:hover { opacity: 0.8; }
+
+  /* ── Subscribe modal ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(26,18,8,0.45); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 2rem; max-width: 400px; width: 100%; position: relative; animation: slideUp 0.18s ease; }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .modal-close { position: absolute; top: 0.9rem; right: 1rem; background: none; border: none; font-size: 1.2rem; color: var(--ink-faint); cursor: pointer; line-height: 1; padding: 2px 4px; }
+  .modal-close:hover { color: var(--ink); }
+  .modal-logo { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; }
+  .modal-logo span { color: var(--accent); }
+  .modal-title { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; }
+  .modal-subtitle { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 1.25rem; line-height: 1.5; }
+  .modal-input-wrap { position: relative; margin-bottom: 0.5rem; }
+  .modal-input { width: 100%; font-family: var(--font-body); font-size: 0.85rem; color: var(--ink); background: var(--paper-card); border: 1px solid var(--rule); border-radius: 5px; padding: 9px 12px; outline: none; transition: border-color 0.12s; }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-input.error { border-color: #c0392b; }
+  .modal-error { font-size: 0.72rem; color: var(--accent); margin-bottom: 0.75rem; min-height: 1rem; }
+  .modal-submit { width: 100%; background: var(--ink); color: var(--paper); border: none; border-radius: 5px; padding: 10px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.12s; margin-top: 0.25rem; }
+  .modal-submit:hover { opacity: 0.82; }
+  .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── Unsubscribe modal input ── */
+  .unsub-modal .modal-subtitle { margin-bottom: 1rem; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); font-size: 0.82rem; font-weight: 500; padding: 0.6rem 1.25rem; border-radius: 6px; z-index: 300; white-space: nowrap; animation: toastIn 0.2s ease; }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
   /* ── Animations ── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(5px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
   .news-list .news-row { animation: fadeUp 0.25s ease both; }
   .news-row:nth-child(2) { animation-delay: 0.04s; }
   .news-row:nth-child(3) { animation-delay: 0.08s; }
@@ -390,7 +196,9 @@
     .row-right { display: none; }
     .page { padding: 1.25rem 1rem 3rem; }
     .detail-wrap { padding: 1.25rem 1rem 3rem; }
-    .edition-select { max-width: 140px; }
+    .edition-select { max-width: 120px; }
+    .search-input { width: 140px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   }
 </style>
 </head>
@@ -400,18 +208,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function getNextRefreshDate() {
   const now = new Date();
   const day = now.getDay();
   const diff = day === 0 ? 7 : (7 - day);
   const next = new Date(now);
   next.setDate(now.getDate() + diff);
-  return next.toLocaleDateString('en-IN', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-  });
+  return next.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
 const IMPACT_LABELS = { high: 'High impact', med: 'Medium', low: 'Low' };
@@ -426,6 +236,143 @@ function ImpactTag({ level }) {
   return React.createElement('span', { className: `impact impact-${level}` }, IMPACT_LABELS[level]);
 }
 
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function Toast({ message }) {
+  return React.createElement('div', { className: 'toast' }, message);
+}
+
+// ── Subscribe modal ───────────────────────────────────────────────────────────
+function SubscribeModal({ onClose, onSuccess }) {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, []);
+
+  async function handleSubmit() {
+    const trimmed = email.trim();
+    if (!trimmed) { setError('Please enter your email address.'); return; }
+    if (!isValidEmail(trimmed)) { setError('Please enter a valid email address.'); return; }
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Something went wrong');
+      if (data.message === 'already_subscribed') {
+        onSuccess('You\'re already subscribed!');
+      } else {
+        onSuccess('Subscribed! See you in your inbox every Monday.');
+      }
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter') handleSubmit();
+    if (e.key === 'Escape') onClose();
+  }
+
+  return React.createElement('div', {
+    className: 'modal-overlay',
+    onClick: e => e.target.classList.contains('modal-overlay') && onClose()
+  },
+    React.createElement('div', { className: 'modal' },
+      React.createElement('button', { className: 'modal-close', onClick: onClose }, '×'),
+      React.createElement('div', { className: 'modal-logo' }, 'Pixie', React.createElement('span', null, ' Times')),
+      React.createElement('div', { className: 'modal-title' }, 'Get it in your inbox'),
+      React.createElement('div', { className: 'modal-subtitle' },
+        'Every Monday morning, the week\'s credit card and payments news — curated for product, design, and business teams.'
+      ),
+      React.createElement('input', {
+        ref: inputRef,
+        className: `modal-input${error ? ' error' : ''}`,
+        type: 'email',
+        placeholder: 'your@email.com',
+        value: email,
+        onChange: e => { setEmail(e.target.value); setError(''); },
+        onKeyDown: handleKey,
+      }),
+      React.createElement('div', { className: 'modal-error' }, error),
+      React.createElement('button', {
+        className: 'modal-submit',
+        onClick: handleSubmit,
+        disabled: loading,
+      }, loading ? 'Subscribing…' : 'Subscribe')
+    )
+  );
+}
+
+// ── Unsubscribe modal ─────────────────────────────────────────────────────────
+function UnsubscribeModal({ onClose, onSuccess }) {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+
+  useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, []);
+
+  async function handleSubmit() {
+    const trimmed = email.trim();
+    if (!trimmed) { setError('Please enter your email address.'); return; }
+    if (!isValidEmail(trimmed)) { setError('Please enter a valid email address.'); return; }
+    setError('');
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/unsubscribe?email=${encodeURIComponent(trimmed)}`);
+      if (!res.ok) throw new Error('Something went wrong');
+      onSuccess('You\'ve been unsubscribed. Sorry to see you go.');
+      onClose();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter') handleSubmit();
+    if (e.key === 'Escape') onClose();
+  }
+
+  return React.createElement('div', {
+    className: 'modal-overlay',
+    onClick: e => e.target.classList.contains('modal-overlay') && onClose()
+  },
+    React.createElement('div', { className: 'modal unsub-modal' },
+      React.createElement('button', { className: 'modal-close', onClick: onClose }, '×'),
+      React.createElement('div', { className: 'modal-logo' }, 'Pixie', React.createElement('span', null, ' Times')),
+      React.createElement('div', { className: 'modal-title' }, 'Unsubscribe'),
+      React.createElement('div', { className: 'modal-subtitle' }, 'Enter your email to stop receiving the weekly digest.'),
+      React.createElement('input', {
+        ref: inputRef,
+        className: `modal-input${error ? ' error' : ''}`,
+        type: 'email',
+        placeholder: 'your@email.com',
+        value: email,
+        onChange: e => { setEmail(e.target.value); setError(''); },
+        onKeyDown: handleKey,
+      }),
+      React.createElement('div', { className: 'modal-error' }, error),
+      React.createElement('button', {
+        className: 'modal-submit',
+        onClick: handleSubmit,
+        disabled: loading,
+        style: { background: '#6b6052' }
+      }, loading ? 'Removing…' : 'Unsubscribe')
+    )
+  );
+}
+
 // ── News row ──────────────────────────────────────────────────────────────────
 function NewsRow({ item, onClick }) {
   return React.createElement('div', { className: 'news-row', onClick: () => onClick(item) },
@@ -437,8 +384,7 @@ function NewsRow({ item, onClick }) {
       React.createElement('div', { className: 'row-summary' }, item.summary),
       React.createElement('div', { className: 'row-footer' },
         React.createElement('span', { className: 'row-source' }, item.source),
-        ' · ',
-        item.date
+        ' · ', item.date
       )
     ),
     React.createElement('div', { className: 'row-right' },
@@ -450,71 +396,170 @@ function NewsRow({ item, onClick }) {
 // ── Detail page ───────────────────────────────────────────────────────────────
 function DetailPage({ item, onBack }) {
   return React.createElement('div', { className: 'detail-wrap' },
-    React.createElement('button', { className: 'detail-back', onClick: onBack },
-      '← Back to edition'
-    ),
+    React.createElement('button', { className: 'detail-back', onClick: onBack }, '← Back to edition'),
     React.createElement('div', { className: 'detail-badge-row' },
       React.createElement(Badge, { className: item.badge, label: item.badgeLabel }),
       React.createElement(ImpactTag, { level: item.impact })
     ),
     React.createElement('h1', { className: 'detail-headline' }, item.headline),
     React.createElement('div', { className: 'detail-byline' },
-      React.createElement('strong', null, item.source),
-      ` · ${item.date}`
+      React.createElement('strong', null, item.source), ` · ${item.date}`
     ),
-
-    // Original description from source
-    React.createElement('div', { className: 'detail-description' },
-      item.description || item.summary
-    ),
-
-    // Why it matters callout
+    React.createElement('div', { className: 'detail-description' }, item.description || item.summary),
     item.highlight && React.createElement('div', { className: 'detail-highlight' },
       React.createElement('div', { className: 'detail-highlight-label' }, item.highlight.label),
       React.createElement('div', { className: 'detail-highlight-text' }, item.highlight.text)
     ),
-
-    // Link to original article
     item.sourceUrl && React.createElement('a', {
-      href: item.sourceUrl,
-      className: 'read-more-link',
-      target: '_blank',
-      rel: 'noopener noreferrer'
+      href: item.sourceUrl, className: 'read-more-link', target: '_blank', rel: 'noopener noreferrer'
     }, `Read full story on ${item.source} →`),
-
     React.createElement('div', { className: 'detail-tags' },
       (item.tags || []).map(t => React.createElement('span', { key: t, className: 'tag' }, t))
     )
   );
 }
 
+// ── Search results ────────────────────────────────────────────────────────────
+function SearchPage({ query, editions, onItemClick }) {
+  const results = [];
+  for (const edition of editions) {
+    for (const item of (edition.news || [])) {
+      const haystack = `${item.headline} ${item.summary} ${item.description || ''} ${(item.tags || []).join(' ')}`.toLowerCase();
+      if (haystack.includes(query.toLowerCase())) {
+        results.push({ item, editionLabel: edition.label });
+      }
+    }
+  }
+  return React.createElement('div', { className: 'search-page' },
+    React.createElement('div', { className: 'search-header' },
+      React.createElement('div', { className: 'search-title' },
+        'Results for ', React.createElement('em', null, `"${query}"`)
+      ),
+      React.createElement('span', { className: 'search-count' },
+        results.length === 0 ? 'No results' : `${results.length} ${results.length === 1 ? 'story' : 'stories'}`
+      )
+    ),
+    results.length === 0
+      ? React.createElement('div', { className: 'search-empty' },
+          React.createElement('div', { className: 'search-empty-title' }, 'Nothing found'),
+          `No stories matching "${query}" across the last ${editions.length} editions.`
+        )
+      : React.createElement('div', { className: 'news-list' },
+          results.map(({ item, editionLabel }, i) =>
+            React.createElement('div', {
+              key: `${editionLabel}-${item.id}`,
+              className: 'news-row',
+              style: { animationDelay: `${i * 0.04}s` },
+              onClick: () => onItemClick(item)
+            },
+              React.createElement('div', { className: 'row-left' },
+                React.createElement('div', { className: 'row-meta' },
+                  React.createElement(Badge, { className: item.badge, label: item.badgeLabel }),
+                  React.createElement('span', { className: 'search-edition-tag' }, editionLabel)
+                ),
+                React.createElement('div', { className: 'row-headline' }, item.headline),
+                React.createElement('div', { className: 'row-summary' }, item.summary),
+                React.createElement('div', { className: 'row-footer' },
+                  React.createElement('span', { className: 'row-source' }, item.source),
+                  ' · ', item.date
+                )
+              ),
+              React.createElement('div', { className: 'row-right' },
+                React.createElement(ImpactTag, { level: item.impact })
+              )
+            )
+          )
+        )
+  );
+}
+
 // ── Masthead ──────────────────────────────────────────────────────────────────
-function Masthead({ editions, editionId, onEditionChange, onLogoClick }) {
-  const nextRefresh = getNextRefreshDate();
+function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => { if (searchOpen && inputRef.current) inputRef.current.focus(); }, [searchOpen]);
+
+  const SearchIcon = () => React.createElement('svg', {
+    viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round'
+  },
+    React.createElement('circle', { cx: '6.5', cy: '6.5', r: '4' }),
+    React.createElement('line', { x1: '10', y1: '10', x2: '14', y2: '14' })
+  );
+
+  function closeSearch() { setSearchOpen(false); setQuery(''); onSearch(''); }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && query.trim()) onSearch(query.trim());
+    if (e.key === 'Escape') closeSearch();
+  }
+
+  function handleChange(e) {
+    setQuery(e.target.value);
+    if (e.target.value.trim().length >= 2) onSearch(e.target.value.trim());
+    else if (e.target.value.trim() === '') onSearch('');
+  }
+
   return React.createElement('header', { className: 'masthead' },
     React.createElement('div', { className: 'masthead-top' },
       React.createElement('div', { className: 'logo-area' },
-        React.createElement('div', { className: 'logo', onClick: onLogoClick },
+        React.createElement('div', { className: 'logo', onClick: () => { closeSearch(); onLogoClick(); } },
           'Pixie', React.createElement('span', null, ' Times')
         ),
         React.createElement('div', { className: 'logo-tagline' }, 'Credit · Payments · Regulation')
       ),
       React.createElement('div', { className: 'masthead-right' },
-        editions.length > 0 && React.createElement('div', { className: 'edition-selector' },
-          React.createElement('span', { className: 'edition-label' }, 'Edition'),
-          React.createElement('select', {
-            className: 'edition-select',
-            value: editionId,
-            onChange: e => onEditionChange(e.target.value)
-          },
-            editions.map(e => React.createElement('option', { key: e.id, value: e.id },
-              e.isCurrent ? `This week · ${e.label}` : e.label
-            ))
-          )
+        React.createElement('div', { className: 'masthead-controls' },
+          searchOpen
+            ? React.createElement('div', { className: 'search-bar' },
+                React.createElement('input', { ref: inputRef, className: 'search-input', type: 'text', placeholder: 'Search all editions…', value: query, onChange: handleChange, onKeyDown: handleKey }),
+                React.createElement('button', { className: 'search-close', onClick: closeSearch }, '×')
+              )
+            : React.createElement(React.Fragment, null,
+                React.createElement('button', { className: 'search-btn', onClick: () => setSearchOpen(true) },
+                  React.createElement(SearchIcon), 'Search'
+                ),
+                editions.length > 0 && React.createElement('div', { className: 'edition-selector' },
+                  React.createElement('span', { className: 'edition-label' }, 'Edition'),
+                  React.createElement('select', {
+                    className: 'edition-select',
+                    value: editionId,
+                    onChange: e => onEditionChange(e.target.value)
+                  },
+                    editions.map(e => React.createElement('option', { key: e.id, value: e.id },
+                      e.isCurrent ? `This week · ${e.label}` : e.label
+                    ))
+                  )
+                )
+              )
         ),
         React.createElement('div', { className: 'refresh-info' },
-          'Next edition ', React.createElement('strong', null, nextRefresh)
+          'Next edition ', React.createElement('strong', null, getNextRefreshDate())
         )
+      )
+    )
+  );
+}
+
+// ── Footer ────────────────────────────────────────────────────────────────────
+function Footer({ onSubscribe, onUnsubscribe }) {
+  return React.createElement('footer', { className: 'site-footer' },
+    React.createElement('div', { className: 'footer-inner' },
+      React.createElement('div', { className: 'footer-left' },
+        React.createElement('div', { className: 'footer-copy' },
+          'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
+        ),
+        React.createElement('div', { className: 'footer-unsub' },
+          'Already subscribed? ',
+          React.createElement('a', { onClick: onUnsubscribe }, 'Unsubscribe')
+        )
+      ),
+      React.createElement('div', { className: 'footer-subscribe' },
+        React.createElement('span', { className: 'footer-subscribe-text' },
+          'Get this in your inbox every Monday.'
+        ),
+        React.createElement('button', { className: 'subscribe-cta', onClick: onSubscribe }, 'Subscribe')
       )
     )
   );
@@ -527,10 +572,13 @@ function App() {
   const [detailItem, setDetailItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSubscribe, setShowSubscribe] = useState(false);
+  const [showUnsubscribe, setShowUnsubscribe] = useState(false);
+  const [toast, setToast] = useState('');
 
   async function loadEditions() {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
       const res = await fetch('/api/editions');
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
@@ -538,107 +586,97 @@ function App() {
       const eds = data.editions || [];
       setEditions(eds);
       if (eds.length > 0) setEditionId(eds[0].id);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
   }
 
   useEffect(() => { loadEditions(); }, []);
 
-  function handleEditionChange(id) {
-    setEditionId(id);
-    setDetailItem(null);
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(''), 2500);
   }
 
   const edition = editions.find(e => e.id === editionId);
+  const isSearching = searchQuery.trim().length >= 2;
 
-  // ── Render loading ──
-  if (loading) {
-    return React.createElement(React.Fragment, null,
-      React.createElement(Masthead, { editions: [], editionId: null, onEditionChange: () => {}, onLogoClick: () => {} }),
-      React.createElement('div', { className: 'state-center' },
-        React.createElement('div', { className: 'spinner' }),
-        React.createElement('p', null, 'Loading this week\'s edition…')
-      )
-    );
-  }
+  const mastheadProps = {
+    editions, editionId,
+    onEditionChange: id => { setEditionId(id); setDetailItem(null); setSearchQuery(''); },
+    onLogoClick: () => { setDetailItem(null); setSearchQuery(''); },
+    onSearch: setSearchQuery,
+  };
 
-  // ── Render error ──
-  if (error) {
-    return React.createElement(React.Fragment, null,
-      React.createElement(Masthead, { editions: [], editionId: null, onEditionChange: () => {}, onLogoClick: () => {} }),
-      React.createElement('div', { className: 'state-center' },
-        React.createElement('div', { className: 'error-icon' }, '○'),
-        React.createElement('p', null, 'Could not load editions. The first edition will be ready after the Sunday refresh.'),
-        React.createElement('button', { className: 'retry-btn', onClick: loadEditions }, 'Try again')
-      )
-    );
-  }
+  const footer = React.createElement(Footer, {
+    onSubscribe: () => setShowSubscribe(true),
+    onUnsubscribe: () => setShowUnsubscribe(true),
+  });
 
-  // ── Render empty (no editions yet) ──
-  if (editions.length === 0) {
-    return React.createElement(React.Fragment, null,
-      React.createElement(Masthead, { editions: [], editionId: null, onEditionChange: () => {}, onLogoClick: () => {} }),
-      React.createElement('div', { className: 'empty-state' },
-        React.createElement('div', { className: 'empty-title' }, 'First edition coming soon'),
-        React.createElement('p', null,
-          'Pixie Times refreshes every Monday at 12am IST.',
-          React.createElement('br'),
-          'The first edition will appear here automatically after the next refresh.'
-        )
-      )
-    );
-  }
+  const modals = React.createElement(React.Fragment, null,
+    showSubscribe && React.createElement(SubscribeModal, { onClose: () => setShowSubscribe(false), onSuccess: showToast }),
+    showUnsubscribe && React.createElement(UnsubscribeModal, { onClose: () => setShowUnsubscribe(false), onSuccess: showToast }),
+    toast && React.createElement(Toast, { message: toast })
+  );
 
-  if (edition && edition.news.length === 0) {
-    return React.createElement(React.Fragment, null,
-      React.createElement(Masthead, { editions, editionId, onEditionChange: handleEditionChange, onLogoClick: () => setDetailItem(null) }),
-      React.createElement('div', { className: 'empty-state' },
-        React.createElement('div', { className: 'empty-title' }, 'Nothing to report this week'),
-        React.createElement('p', null,
-          'No credit card, UPI, or RBI news met our relevance bar this week.',
-          React.createElement('br'),
-          'Check back next Monday for a fresh edition.'
-        )
-      ),
-      React.createElement('footer', { className: 'site-footer' },
-        'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
+  if (loading) return React.createElement(React.Fragment, null,
+    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
+    React.createElement('div', { className: 'state-center' },
+      React.createElement('div', { className: 'spinner' }),
+      React.createElement('p', null, 'Loading this week\'s edition…')
+    ), footer, modals
+  );
+
+  if (error) return React.createElement(React.Fragment, null,
+    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
+    React.createElement('div', { className: 'state-center' },
+      React.createElement('p', null, 'Could not load editions. The first edition will be ready after the Sunday refresh.'),
+      React.createElement('button', { className: 'retry-btn', onClick: loadEditions }, 'Try again')
+    ), footer, modals
+  );
+
+  if (editions.length === 0) return React.createElement(React.Fragment, null,
+    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
+    React.createElement('div', { className: 'empty-state' },
+      React.createElement('div', { className: 'empty-title' }, 'First edition coming soon'),
+      React.createElement('p', null, 'Pixie Times refreshes every Monday at 12am IST.')
+    ), footer, modals
+  );
+
+  if (edition && edition.news.length === 0 && !isSearching) return React.createElement(React.Fragment, null,
+    React.createElement(Masthead, mastheadProps),
+    React.createElement('div', { className: 'empty-state' },
+      React.createElement('div', { className: 'empty-title' }, 'Nothing to report this week'),
+      React.createElement('p', null,
+        'No credit card, UPI, or RBI news met our relevance bar this week.',
+        React.createElement('br'), 'Check back next Monday for a fresh edition.'
       )
-    );
-  }
+    ), footer, modals
+  );
 
   return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, {
-      editions,
-      editionId,
-      onEditionChange: handleEditionChange,
-      onLogoClick: () => setDetailItem(null)
-    }),
-
+    React.createElement(Masthead, mastheadProps),
     detailItem
       ? React.createElement(DetailPage, { item: detailItem, onBack: () => setDetailItem(null) })
-      : edition && React.createElement('main', { className: 'page' },
-          React.createElement('div', { className: 'edition-banner' },
-            React.createElement('div', { className: 'edition-title' },
-              edition.isCurrent ? 'This week in credit' : `Edition · ${edition.label}`
+      : isSearching
+        ? React.createElement(SearchPage, { query: searchQuery, editions, onItemClick: setDetailItem })
+        : edition && React.createElement('main', { className: 'page' },
+            React.createElement('div', { className: 'edition-banner' },
+              React.createElement('div', { className: 'edition-title' },
+                edition.isCurrent ? 'This week in credit' : `Edition · ${edition.label}`
+              ),
+              React.createElement('div', { className: 'edition-right' },
+                !edition.isCurrent && React.createElement('span', { className: 'past-chip' }, 'Past edition'),
+                React.createElement('span', { className: 'edition-stories' }, `${edition.news.length} stories`)
+              )
             ),
-            React.createElement('div', { className: 'edition-right' },
-              !edition.isCurrent && React.createElement('span', { className: 'past-chip' }, 'Past edition'),
-              React.createElement('span', { className: 'edition-stories' }, `${edition.news.length} stories`)
+            React.createElement('div', { className: 'news-list' },
+              edition.news.map(item =>
+                React.createElement(NewsRow, { key: item.id, item, onClick: setDetailItem })
+              )
             )
           ),
-          React.createElement('div', { className: 'news-list' },
-            edition.news.map(item =>
-              React.createElement(NewsRow, { key: item.id, item, onClick: setDetailItem })
-            )
-          )
-        ),
-
-    React.createElement('footer', { className: 'site-footer' },
-      'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
-    )
+    footer,
+    modals
   );
 }
 
