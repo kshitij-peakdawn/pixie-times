@@ -46,7 +46,8 @@
   .masthead-controls { display: flex; align-items: center; gap: 8px; }
   .edition-selector { display: flex; align-items: center; gap: 7px; }
   .edition-label { font-size: 0.7rem; color: var(--ink-muted); font-weight: 500; white-space: nowrap; }
-  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: none; }  .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: 200px; }
+  .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
   .refresh-info { font-size: 0.67rem; color: var(--ink-faint); }
   .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
 
@@ -190,13 +191,22 @@
   .news-row:nth-child(9) { animation-delay: 0.32s; }
   .news-row:nth-child(10) { animation-delay: 0.36s; }
 
+  /* ── Search icon-only button (mobile) ── */
+  .search-icon-btn { display: none; align-items: center; justify-content: center; background: none; border: none; padding: 6px; cursor: pointer; color: var(--ink-muted); flex-shrink: 0; transition: color 0.12s; }
+  .search-icon-btn:hover { color: var(--ink); }
+  .search-icon-btn svg { width: 18px; height: 18px; }
+
   @media (max-width: 540px) {
     .masthead-top { padding: 0.65rem 1rem; }
     .row-right { display: none; }
     .page { padding: 1.25rem 1rem 3rem; }
     .detail-wrap { padding: 1.25rem 1rem 3rem; }
     .edition-select { max-width: none; }
-    .search-input { width: 140px; }
+    .refresh-info { display: none; }
+    .search-btn { display: none; }
+    .search-icon-btn { display: flex; }
+    .search-input { width: 130px; font-size: 0.78rem; }
+    .edition-label { display: none; }
     .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   }
 </style>
@@ -480,8 +490,9 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
 
   useEffect(() => { if (searchOpen && inputRef.current) inputRef.current.focus(); }, [searchOpen]);
 
-  const SearchIcon = () => React.createElement('svg', {
-    viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round'
+  const SearchIcon = (size) => React.createElement('svg', {
+    viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round',
+    style: { width: size + 'px', height: size + 'px' }
   },
     React.createElement('circle', { cx: '6.5', cy: '6.5', r: '4' }),
     React.createElement('line', { x1: '10', y1: '10', x2: '14', y2: '14' })
@@ -500,6 +511,22 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
     else if (e.target.value.trim() === '') onSearch('');
   }
 
+  const searchBar = React.createElement('div', { className: 'search-bar' },
+    React.createElement('input', { ref: inputRef, className: 'search-input', type: 'text', placeholder: 'Search all editions…', value: query, onChange: handleChange, onKeyDown: handleKey }),
+    React.createElement('button', { className: 'search-close', onClick: closeSearch }, '×')
+  );
+
+  const editionDropdown = editions.length > 0 && React.createElement('div', { className: 'edition-selector' },
+    React.createElement('span', { className: 'edition-label' }, 'Edition'),
+    React.createElement('select', {
+      className: 'edition-select',
+      value: editionId,
+      onChange: e => onEditionChange(e.target.value)
+    },
+      editions.map(e => React.createElement('option', { key: e.id, value: e.id }, e.label))
+    )
+  );
+
   return React.createElement('header', { className: 'masthead' },
     React.createElement('div', { className: 'masthead-top' },
       React.createElement('div', { className: 'logo-area' },
@@ -511,26 +538,17 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
       React.createElement('div', { className: 'masthead-right' },
         React.createElement('div', { className: 'masthead-controls' },
           searchOpen
-            ? React.createElement('div', { className: 'search-bar' },
-                React.createElement('input', { ref: inputRef, className: 'search-input', type: 'text', placeholder: 'Search all editions…', value: query, onChange: handleChange, onKeyDown: handleKey }),
-                React.createElement('button', { className: 'search-close', onClick: closeSearch }, '×')
-              )
+            ? searchBar
             : React.createElement(React.Fragment, null,
+                // Desktop: text button with label
                 React.createElement('button', { className: 'search-btn', onClick: () => setSearchOpen(true) },
-                  React.createElement(SearchIcon), 'Search'
+                  SearchIcon(13), 'Search'
                 ),
-                editions.length > 0 && React.createElement('div', { className: 'edition-selector' },
-                  React.createElement('span', { className: 'edition-label' }, 'Edition'),
-                  React.createElement('select', {
-                    className: 'edition-select',
-                    value: editionId,
-                    onChange: e => onEditionChange(e.target.value)
-                  },
-                    editions.map(e => React.createElement('option', { key: e.id, value: e.id },
-                      e.label
-                    ))
-                  )
-                )
+                // Mobile: icon-only button (shown via CSS)
+                React.createElement('button', { className: 'search-icon-btn', onClick: () => setSearchOpen(true) },
+                  SearchIcon(18)
+                ),
+                editionDropdown
               )
         ),
         React.createElement('div', { className: 'refresh-info' },
@@ -542,12 +560,16 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
 }
 
 // ── Footer ────────────────────────────────────────────────────────────────────
-function Footer({ onSubscribe }) {
+function Footer({ onSubscribe, onUnsubscribe }) {
   return React.createElement('footer', { className: 'site-footer' },
     React.createElement('div', { className: 'footer-inner' },
       React.createElement('div', { className: 'footer-left' },
         React.createElement('div', { className: 'footer-copy' },
           'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
+        ),
+        React.createElement('div', { className: 'footer-unsub' },
+          'Already subscribed? ',
+          React.createElement('a', { onClick: onUnsubscribe }, 'Unsubscribe')
         )
       ),
       React.createElement('div', { className: 'footer-subscribe' },
@@ -559,6 +581,7 @@ function Footer({ onSubscribe }) {
     )
   );
 }
+
 // ── App ───────────────────────────────────────────────────────────────────────
 function App() {
   const [editions, setEditions] = useState([]);
@@ -568,6 +591,7 @@ function App() {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showSubscribe, setShowSubscribe] = useState(false);
+  const [showUnsubscribe, setShowUnsubscribe] = useState(false);
   const [toast, setToast] = useState('');
 
   async function loadEditions() {
@@ -602,10 +626,12 @@ function App() {
 
   const footer = React.createElement(Footer, {
     onSubscribe: () => setShowSubscribe(true),
+    onUnsubscribe: () => setShowUnsubscribe(true),
   });
 
   const modals = React.createElement(React.Fragment, null,
     showSubscribe && React.createElement(SubscribeModal, { onClose: () => setShowSubscribe(false), onSuccess: showToast }),
+    showUnsubscribe && React.createElement(UnsubscribeModal, { onClose: () => setShowUnsubscribe(false), onSuccess: showToast }),
     toast && React.createElement(Toast, { message: toast })
   );
 
