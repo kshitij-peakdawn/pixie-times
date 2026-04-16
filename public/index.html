@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pixie Times</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNCIgZmlsbD0iI2ZhZjdmMiIvPjx0ZXh0IHg9IjMiIHk9IjI1IiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzFhMTIwOCI+UDwvdGV4dD48dGV4dCB4PSIxNiIgeT0iMjUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjYzAzOTJiIj5UPC90ZXh0Pjwvc3ZnPg==" />
-
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,7 +32,8 @@
     --font-body: 'DM Sans', system-ui, sans-serif;
   }
 
-body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+
   /* ── Masthead ── */
   .masthead { border-bottom: 3px double var(--ink); position: sticky; top: 0; background: var(--paper); z-index: 100; box-shadow: 0 2px 12px rgba(26,18,8,0.06); }
   .masthead-top { display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 2rem; gap: 1rem; }
@@ -47,10 +47,17 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .masthead-controls { display: flex; align-items: center; gap: 8px; }
   .edition-selector { display: flex; align-items: center; gap: 7px; }
   .edition-label { font-size: 0.7rem; color: var(--ink-muted); font-weight: 500; white-space: nowrap; }
-  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: 200px; }
+  .edition-select { font-family: var(--font-body); font-size: 0.72rem; color: var(--ink); background: var(--paper-warm); border: 1px solid var(--rule); border-radius: 4px; padding: 3px 24px 3px 8px; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b6052'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; cursor: pointer; font-weight: 500; max-width: none; }
   .edition-select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
   .refresh-info { font-size: 0.67rem; color: var(--ink-faint); }
   .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
+
+  /* ── Pill tabs ── */
+  .pill-tabs { display: flex; align-items: center; gap: 6px; padding: 0.55rem 2rem; border-top: 1px solid var(--rule); }
+  .pill-tab { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; padding: 4px 14px; border-radius: 20px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--ink-muted); transition: all 0.15s; white-space: nowrap; }
+  .pill-tab:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .pill-tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .pill-tab.active.competition { background: var(--accent); border-color: var(--accent); }
 
   /* ── Search ── */
   .search-btn { display: flex; align-items: center; gap: 5px; background: none; border: 1px solid var(--rule); border-radius: 4px; padding: 4px 10px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500; color: var(--ink-muted); cursor: pointer; transition: background 0.12s, border-color 0.12s, color 0.12s; white-space: nowrap; flex-shrink: 0; }
@@ -62,9 +69,13 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .search-input:focus { border-color: var(--accent); }
   .search-close { background: none; border: none; cursor: pointer; color: var(--ink-faint); font-size: 1rem; line-height: 1; padding: 2px 4px; transition: color 0.12s; flex-shrink: 0; }
   .search-close:hover { color: var(--ink); }
+  .search-icon-btn { display: none; align-items: center; justify-content: center; background: none; border: none; padding: 6px; cursor: pointer; color: var(--ink-muted); flex-shrink: 0; transition: color 0.12s; }
+  .search-icon-btn:hover { color: var(--ink); }
+  .search-icon-btn svg { width: 18px; height: 18px; }
 
   /* ── Page ── */
-.page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 2rem; flex: 1; }
+  .page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 2rem; flex: 1; }
+
   /* ── States ── */
   .state-center { max-width: 820px; margin: 0 auto; padding: 4rem 1.5rem; text-align: center; color: var(--ink-muted); }
   .spinner { width: 28px; height: 28px; border: 2px solid var(--rule); border-top-color: var(--ink-muted); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
@@ -112,7 +123,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .impact-low  { background: #eaf5ea; color: #276127; }
 
   /* ── Detail page ── */
-  .detail-wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; animation: fadeUp 0.2s ease both; }
+  .detail-wrap { max-width: 680px; margin: 0 auto; padding: 2rem 1.5rem 4rem; animation: fadeUp 0.2s ease both; flex: 1; }
   .detail-back { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--ink-muted); cursor: pointer; border: none; background: none; font-family: var(--font-body); padding: 0; margin-bottom: 1.75rem; transition: color 0.12s; }
   .detail-back:hover { color: var(--accent); }
   .detail-badge-row { display: flex; align-items: center; gap: 7px; margin-bottom: 0.85rem; flex-wrap: wrap; }
@@ -129,7 +140,7 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .tag { font-size: 0.68rem; background: var(--paper-warm); color: var(--ink-muted); border-radius: 3px; padding: 2px 8px; }
 
   /* ── Search results ── */
-  .search-page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; }
+  .search-page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 4rem; flex: 1; }
   .search-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--rule); gap: 0.75rem; flex-wrap: wrap; }
   .search-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
   .search-title em { color: var(--accent); font-style: normal; }
@@ -138,16 +149,69 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .search-empty { text-align: center; padding: 3rem 1rem; color: var(--ink-muted); font-size: 0.88rem; }
   .search-empty-title { font-family: var(--font-display); font-size: 1.05rem; color: var(--ink); margin-bottom: 0.4rem; }
 
+  /* ── Competition tab ── */
+  .comp-page { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 2rem; flex: 1; }
+  .comp-banner { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.4rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--rule); gap: 0.75rem; flex-wrap: wrap; }
+  .comp-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--ink); }
+  .comp-subtitle { font-size: 0.7rem; color: var(--ink-faint); }
+
+  /* QCR banner */
+  .qcr-banner { background: var(--ink); border-radius: 6px; padding: 1.1rem 1.25rem; margin-bottom: 1.5rem; cursor: pointer; transition: opacity 0.12s; }
+  .qcr-banner:hover { opacity: 0.92; }
+  .qcr-label { font-size: 0.62rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.3rem; }
+  .qcr-title { font-family: var(--font-display); font-size: 1rem; color: var(--paper); font-weight: 600; margin-bottom: 0.25rem; }
+  .qcr-preview { font-size: 0.8rem; color: var(--ink-faint); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Card profile */
+  .comp-card { background: var(--paper-card); border: 1px solid var(--rule); border-radius: 6px; margin-bottom: 1rem; overflow: hidden; }
+  .comp-card-header { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1rem; cursor: pointer; transition: background 0.1s; gap: 0.75rem; }
+  .comp-card-header:hover { background: var(--paper-warm); }
+  .comp-card-name { font-family: var(--font-display); font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+  .comp-card-issuer { font-size: 0.7rem; color: var(--ink-faint); margin-top: 1px; }
+  .comp-card-chevron { font-size: 0.75rem; color: var(--ink-faint); transition: transform 0.15s; flex-shrink: 0; }
+  .comp-card-chevron.open { transform: rotate(180deg); }
+  .comp-card-body { border-top: 1px solid var(--paper-warm); padding: 0.85rem 1rem; }
+
+  /* Profile grid */
+  .profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.65rem; margin-bottom: 1rem; }
+  .profile-item { background: var(--paper-warm); border-radius: 4px; padding: 0.5rem 0.65rem; }
+  .profile-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 500; margin-bottom: 2px; }
+  .profile-value { font-size: 0.8rem; color: var(--ink); font-weight: 500; }
+
+  /* Changelog */
+  .changelog-heading { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 500; margin-bottom: 0.5rem; }
+  .changelog-empty { font-size: 0.8rem; color: var(--ink-faint); font-style: italic; }
+  .changelog-entry { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.55rem 0; border-bottom: 1px solid var(--paper-warm); }
+  .changelog-entry:last-child { border-bottom: none; }
+  .change-impact { flex-shrink: 0; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 3px; margin-top: 1px; }
+  .change-positive { background: var(--badge-launch-bg); color: var(--badge-launch); }
+  .change-negative { background: #ffeaea; color: #991a1a; }
+  .change-neutral  { background: var(--paper-warm); color: var(--ink-muted); }
+  .change-text { font-size: 0.82rem; color: var(--ink); line-height: 1.45; flex: 1; min-width: 0; }
+  .change-meta { font-size: 0.67rem; color: var(--ink-faint); margin-top: 2px; }
+
+  /* QCR detail */
+  .qcr-detail { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 2rem; flex: 1; animation: fadeUp 0.2s ease both; }
+  .qcr-narrative { font-size: 0.9rem; line-height: 1.75; color: var(--ink); margin-bottom: 1.5rem; }
+  .qcr-section-title { font-family: var(--font-display); font-size: 1rem; font-weight: 600; color: var(--ink); margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--rule); }
+  .qcr-move { background: var(--paper-card); border: 1px solid var(--rule); border-radius: 5px; padding: 0.75rem 0.9rem; margin-bottom: 0.65rem; }
+  .qcr-move-card { font-weight: 500; font-size: 0.85rem; color: var(--ink); margin-bottom: 0.2rem; }
+  .qcr-move-text { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 0.25rem; }
+  .qcr-implication { font-size: 0.78rem; color: var(--accent); font-style: italic; }
+  .qcr-list { list-style: none; margin-bottom: 1.25rem; }
+  .qcr-list li { font-size: 0.85rem; color: var(--ink-muted); padding: 0.35rem 0; border-bottom: 1px solid var(--paper-warm); display: flex; gap: 0.5rem; }
+  .qcr-list li::before { content: '—'; color: var(--ink-faint); flex-shrink: 0; }
+
   /* ── Footer ── */
-.site-footer { border-top: 1px solid var(--rule); padding: 1.5rem 2rem; font-size: 0.72rem; color: var(--ink-faint); position: sticky; bottom: 0; background: var(--paper); z-index: 50; box-shadow: 0 -2px 12px rgba(26,18,8,0.06); }  .footer-inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-  .footer-left { display: flex; flex-direction: column; gap: 3px; }
+  .site-footer { border-top: 1px solid var(--rule); padding: 1.25rem 2rem; font-size: 0.72rem; color: var(--ink-faint); position: sticky; bottom: 0; background: var(--paper); z-index: 50; box-shadow: 0 -2px 12px rgba(26,18,8,0.06); }
+  .footer-inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
   .footer-copy { letter-spacing: 0.03em; }
   .footer-subscribe { display: flex; align-items: center; gap: 10px; }
   .footer-subscribe-text { font-size: 0.75rem; color: var(--ink-muted); }
   .subscribe-cta { background: var(--ink); color: var(--paper); border: none; border-radius: 4px; padding: 5px 14px; font-family: var(--font-body); font-size: 0.72rem; font-weight: 500; cursor: pointer; transition: opacity 0.12s; white-space: nowrap; }
   .subscribe-cta:hover { opacity: 0.8; }
 
-  /* ── Subscribe modal ── */
+  /* ── Modal ── */
   .modal-overlay { position: fixed; inset: 0; background: rgba(26,18,8,0.45); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; animation: fadeIn 0.15s ease; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .modal { background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 2rem; max-width: 400px; width: 100%; position: relative; animation: slideUp 0.18s ease; }
@@ -157,19 +221,25 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .modal-logo { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--ink); margin-bottom: 0.5rem; }
   .modal-logo span { color: var(--accent); }
   .modal-title { font-size: 0.95rem; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; }
-  .modal-subtitle { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 1.25rem; line-height: 1.5; }
-  .modal-input-wrap { position: relative; margin-bottom: 0.5rem; }
-  .modal-input { width: 100%; font-family: var(--font-body); font-size: 0.85rem; color: var(--ink); background: var(--paper-card); border: 1px solid var(--rule); border-radius: 5px; padding: 9px 12px; outline: none; transition: border-color 0.12s; }
+  .modal-subtitle { font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 1.1rem; line-height: 1.5; }
+  .modal-input { width: 100%; font-family: var(--font-body); font-size: 0.85rem; color: var(--ink); background: var(--paper-card); border: 1px solid var(--rule); border-radius: 5px; padding: 9px 12px; outline: none; transition: border-color 0.12s; margin-bottom: 0.75rem; }
   .modal-input:focus { border-color: var(--accent); }
-  .modal-input.error { border-color: #c0392b; }
-  .modal-error { font-size: 0.72rem; color: var(--accent); margin-bottom: 0.75rem; min-height: 1rem; }
-  .modal-submit { width: 100%; background: var(--ink); color: var(--paper); border: none; border-radius: 5px; padding: 10px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.12s; margin-top: 0.25rem; }
+  .modal-input.error { border-color: var(--accent); }
+  .modal-error { font-size: 0.72rem; color: var(--accent); margin-bottom: 0.5rem; min-height: 1rem; }
+
+  /* Checkbox list */
+  .modal-checks { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .modal-check { display: flex; align-items: flex-start; gap: 0.6rem; cursor: pointer; }
+  .modal-check input[type="checkbox"] { margin-top: 2px; accent-color: var(--ink); width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+  .modal-check-label { font-size: 0.82rem; color: var(--ink); line-height: 1.4; }
+  .modal-check-sub { font-size: 0.72rem; color: var(--ink-muted); display: block; margin-top: 1px; }
+
+  .modal-submit { width: 100%; background: var(--ink); color: var(--paper); border: none; border-radius: 5px; padding: 10px; font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.12s; }
   .modal-submit:hover { opacity: 0.82; }
   .modal-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-
   /* ── Toast ── */
-  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); font-size: 0.82rem; font-weight: 500; padding: 0.6rem 1.25rem; border-radius: 6px; z-index: 300; white-space: nowrap; animation: toastIn 0.2s ease; }
+  .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); font-size: 0.82rem; font-weight: 500; padding: 0.6rem 1.25rem; border-radius: 6px; z-index: 300; white-space: nowrap; animation: toastIn 0.2s ease; }
   @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
   /* ── Animations ── */
@@ -185,16 +255,12 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
   .news-row:nth-child(9) { animation-delay: 0.32s; }
   .news-row:nth-child(10) { animation-delay: 0.36s; }
 
-  /* ── Search icon-only button (mobile) ── */
-  .search-icon-btn { display: none; align-items: center; justify-content: center; background: none; border: none; padding: 6px; cursor: pointer; color: var(--ink-muted); flex-shrink: 0; transition: color 0.12s; }
-  .search-icon-btn:hover { color: var(--ink); }
-  .search-icon-btn svg { width: 18px; height: 18px; }
-
   @media (max-width: 540px) {
     .masthead-top { padding: 0.65rem 1rem; }
+    .pill-tabs { padding: 0.45rem 1rem; }
     .row-right { display: none; }
-    .page { padding: 1.25rem 1rem 3rem; }
-    .detail-wrap { padding: 1.25rem 1rem 3rem; }
+    .page, .comp-page, .search-page, .qcr-detail { padding: 1.25rem 1rem 2rem; }
+    .detail-wrap { padding: 1.25rem 1rem 2rem; }
     .edition-select { max-width: none; }
     .refresh-info { display: none; }
     .search-btn { display: none; }
@@ -202,18 +268,18 @@ body { background: var(--paper); color: var(--ink); font-family: var(--font-body
     .search-input { width: 130px; font-size: 0.78rem; }
     .edition-label { display: none; }
     .footer-inner { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .site-footer { padding: 1rem; }
+    .profile-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
 const { useState, useEffect, useRef } = React;
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
 function getNextRefreshDate() {
   const now = new Date();
   const day = now.getDay();
@@ -222,272 +288,274 @@ function getNextRefreshDate() {
   next.setDate(now.getDate() + diff);
   return next.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 }
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-}
-
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
 const IMPACT_LABELS = { high: 'High impact', med: 'Medium', low: 'Low' };
+const e = React.createElement;
 
-// ── Badge ─────────────────────────────────────────────────────────────────────
-function Badge({ className, label }) {
-  return React.createElement('span', { className: `badge ${className}` }, label);
-}
-
-// ── Impact tag ────────────────────────────────────────────────────────────────
-function ImpactTag({ level }) {
-  return React.createElement('span', { className: `impact impact-${level}` }, IMPACT_LABELS[level]);
-}
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function Toast({ message }) {
-  return React.createElement('div', { className: 'toast' }, message);
-}
+// ── Primitives ────────────────────────────────────────────────────────────────
+function Badge({ className, label }) { return e('span', { className: `badge ${className}` }, label); }
+function ImpactTag({ level }) { return e('span', { className: `impact impact-${level}` }, IMPACT_LABELS[level]); }
+function Toast({ message }) { return e('div', { className: 'toast' }, message); }
 
 // ── Subscribe modal ───────────────────────────────────────────────────────────
 function SubscribeModal({ onClose, onSuccess }) {
   const [email, setEmail] = useState('');
+  const [news, setNews] = useState(true);
+  const [competition, setCompetition] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const inputRef = useRef(null);
-
   useEffect(() => { if (inputRef.current) inputRef.current.focus(); }, []);
 
   async function handleSubmit() {
     const trimmed = email.trim();
     if (!trimmed) { setError('Please enter your email address.'); return; }
     if (!isValidEmail(trimmed)) { setError('Please enter a valid email address.'); return; }
-    setError('');
-    setLoading(true);
+    if (!news && !competition) { setError('Please select at least one newsletter.'); return; }
+    setError(''); setLoading(true);
     try {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed }),
+        body: JSON.stringify({ email: trimmed, lists: { news, competition } }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Something went wrong');
-      if (data.message === 'already_subscribed') {
-        onSuccess('You\'re already subscribed!');
-      } else {
-        onSuccess('Subscribed! See you in your inbox every Monday.');
-      }
+      onSuccess(data.message === 'already_subscribed' ? 'You\'re already subscribed!' : 'Subscribed! See you in your inbox.');
       onClose();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
   }
 
-  function handleKey(e) {
-    if (e.key === 'Enter') handleSubmit();
-    if (e.key === 'Escape') onClose();
-  }
-
-  return React.createElement('div', {
-    className: 'modal-overlay',
-    onClick: e => e.target.classList.contains('modal-overlay') && onClose()
-  },
-    React.createElement('div', { className: 'modal' },
-      React.createElement('button', { className: 'modal-close', onClick: onClose }, '×'),
-      React.createElement('div', { className: 'modal-logo' }, 'Pixie', React.createElement('span', null, ' Times')),
-      React.createElement('div', { className: 'modal-title' }, 'Get it in your inbox'),
-      React.createElement('div', { className: 'modal-subtitle' },
-        'Every Monday morning, the week\'s credit card and payments news — curated for product, design, and business teams.'
+  return e('div', { className: 'modal-overlay', onClick: ev => ev.target.classList.contains('modal-overlay') && onClose() },
+    e('div', { className: 'modal' },
+      e('button', { className: 'modal-close', onClick: onClose }, '×'),
+      e('div', { className: 'modal-logo' }, 'Pixie', e('span', null, ' Times')),
+      e('div', { className: 'modal-title' }, 'Get it in your inbox'),
+      e('div', { className: 'modal-subtitle' }, 'Curated weekly for India\'s credit card industry.'),
+      e('input', { ref: inputRef, className: `modal-input${error ? ' error' : ''}`, type: 'email', placeholder: 'your@email.com', value: email, onChange: ev => { setEmail(ev.target.value); setError(''); }, onKeyDown: ev => { if (ev.key === 'Enter') handleSubmit(); if (ev.key === 'Escape') onClose(); } }),
+      e('div', { className: 'modal-checks' },
+        e('label', { className: 'modal-check' },
+          e('input', { type: 'checkbox', checked: news, onChange: ev => setNews(ev.target.checked) }),
+          e('span', { className: 'modal-check-label' }, 'Weekly News Digest', e('span', { className: 'modal-check-sub' }, 'Every Monday — credit card launches, RBI guidelines, UPI updates'))
+        ),
+        e('label', { className: 'modal-check' },
+          e('input', { type: 'checkbox', checked: competition, onChange: ev => setCompetition(ev.target.checked) }),
+          e('span', { className: 'modal-check-label' }, 'Monthly Competition Overview', e('span', { className: 'modal-check-sub' }, 'Every 4th Monday — Pixel vs competitor moves'))
+        )
       ),
-      React.createElement('input', {
-        ref: inputRef,
-        className: `modal-input${error ? ' error' : ''}`,
-        type: 'email',
-        placeholder: 'your@email.com',
-        value: email,
-        onChange: e => { setEmail(e.target.value); setError(''); },
-        onKeyDown: handleKey,
-      }),
-      React.createElement('div', { className: 'modal-error' }, error),
-      React.createElement('button', {
-        className: 'modal-submit',
-        onClick: handleSubmit,
-        disabled: loading,
-      }, loading ? 'Subscribing…' : 'Subscribe')
+      e('div', { className: 'modal-error' }, error),
+      e('button', { className: 'modal-submit', onClick: handleSubmit, disabled: loading }, loading ? 'Subscribing…' : 'Subscribe')
     )
   );
 }
 
-
-// ── News row ──────────────────────────────────────────────────────────────────
+// ── News components ───────────────────────────────────────────────────────────
 function NewsRow({ item, onClick }) {
-  return React.createElement('div', { className: 'news-row', onClick: () => onClick(item) },
-    React.createElement('div', { className: 'row-left' },
-      React.createElement('div', { className: 'row-meta' },
-        React.createElement(Badge, { className: item.badge, label: item.badgeLabel })
-      ),
-      React.createElement('div', { className: 'row-headline' }, item.headline),
-      React.createElement('div', { className: 'row-summary' }, item.summary),
-      React.createElement('div', { className: 'row-footer' },
-        React.createElement('span', { className: 'row-source' }, item.source),
-        ' · ', item.date
-      )
+  return e('div', { className: 'news-row', onClick: () => onClick(item) },
+    e('div', { className: 'row-left' },
+      e('div', { className: 'row-meta' }, e(Badge, { className: item.badge, label: item.badgeLabel })),
+      e('div', { className: 'row-headline' }, item.headline),
+      e('div', { className: 'row-summary' }, item.summary),
+      e('div', { className: 'row-footer' }, e('span', { className: 'row-source' }, item.source), ' · ', item.date)
     ),
-    React.createElement('div', { className: 'row-right' },
-      React.createElement(ImpactTag, { level: item.impact })
-    )
+    e('div', { className: 'row-right' }, e(ImpactTag, { level: item.impact }))
   );
 }
 
-// ── Detail page ───────────────────────────────────────────────────────────────
 function DetailPage({ item, onBack }) {
-  return React.createElement('div', { className: 'detail-wrap' },
-    React.createElement('button', { className: 'detail-back', onClick: onBack }, '← Back to edition'),
-    React.createElement('div', { className: 'detail-badge-row' },
-      React.createElement(Badge, { className: item.badge, label: item.badgeLabel }),
-      React.createElement(ImpactTag, { level: item.impact })
+  return e('div', { className: 'detail-wrap' },
+    e('button', { className: 'detail-back', onClick: onBack }, '← Back to edition'),
+    e('div', { className: 'detail-badge-row' }, e(Badge, { className: item.badge, label: item.badgeLabel }), e(ImpactTag, { level: item.impact })),
+    e('h1', { className: 'detail-headline' }, item.headline),
+    e('div', { className: 'detail-byline' }, e('strong', null, item.source), ` · ${item.date}`),
+    e('div', { className: 'detail-description' }, item.description || item.summary),
+    item.highlight && e('div', { className: 'detail-highlight' },
+      e('div', { className: 'detail-highlight-label' }, item.highlight.label),
+      e('div', { className: 'detail-highlight-text' }, item.highlight.text)
     ),
-    React.createElement('h1', { className: 'detail-headline' }, item.headline),
-    React.createElement('div', { className: 'detail-byline' },
-      React.createElement('strong', null, item.source), ` · ${item.date}`
-    ),
-    React.createElement('div', { className: 'detail-description' }, item.description || item.summary),
-    item.highlight && React.createElement('div', { className: 'detail-highlight' },
-      React.createElement('div', { className: 'detail-highlight-label' }, item.highlight.label),
-      React.createElement('div', { className: 'detail-highlight-text' }, item.highlight.text)
-    ),
-    item.sourceUrl && React.createElement('a', {
-      href: item.sourceUrl, className: 'read-more-link', target: '_blank', rel: 'noopener noreferrer'
-    }, `Read full story on ${item.source} →`),
-    React.createElement('div', { className: 'detail-tags' },
-      (item.tags || []).map(t => React.createElement('span', { key: t, className: 'tag' }, t))
-    )
+    item.sourceUrl && e('a', { href: item.sourceUrl, className: 'read-more-link', target: '_blank', rel: 'noopener noreferrer' }, `Read full story on ${item.source} →`),
+    e('div', { className: 'detail-tags' }, (item.tags || []).map(t => e('span', { key: t, className: 'tag' }, t)))
   );
 }
 
-// ── Search results ────────────────────────────────────────────────────────────
 function SearchPage({ query, editions, onItemClick }) {
   const results = [];
   for (const edition of editions) {
     for (const item of (edition.news || [])) {
-      const haystack = `${item.headline} ${item.summary} ${item.description || ''} ${(item.tags || []).join(' ')}`.toLowerCase();
-      if (haystack.includes(query.toLowerCase())) {
-        results.push({ item, editionLabel: edition.label });
-      }
+      const hay = `${item.headline} ${item.summary} ${item.description || ''} ${(item.tags || []).join(' ')}`.toLowerCase();
+      if (hay.includes(query.toLowerCase())) results.push({ item, editionLabel: edition.label });
     }
   }
-  return React.createElement('div', { className: 'search-page' },
-    React.createElement('div', { className: 'search-header' },
-      React.createElement('div', { className: 'search-title' },
-        'Results for ', React.createElement('em', null, `"${query}"`)
-      ),
-      React.createElement('span', { className: 'search-count' },
-        results.length === 0 ? 'No results' : `${results.length} ${results.length === 1 ? 'story' : 'stories'}`
-      )
+  return e('div', { className: 'search-page' },
+    e('div', { className: 'search-header' },
+      e('div', { className: 'search-title' }, 'Results for ', e('em', null, `"${query}"`)),
+      e('span', { className: 'search-count' }, results.length === 0 ? 'No results' : `${results.length} ${results.length === 1 ? 'story' : 'stories'}`)
     ),
     results.length === 0
-      ? React.createElement('div', { className: 'search-empty' },
-          React.createElement('div', { className: 'search-empty-title' }, 'Nothing found'),
-          `No stories matching "${query}" across the last ${editions.length} editions.`
-        )
-      : React.createElement('div', { className: 'news-list' },
+      ? e('div', { className: 'search-empty' }, e('div', { className: 'search-empty-title' }, 'Nothing found'), `No stories matching "${query}" across the last ${editions.length} editions.`)
+      : e('div', { className: 'news-list' },
           results.map(({ item, editionLabel }, i) =>
-            React.createElement('div', {
-              key: `${editionLabel}-${item.id}`,
-              className: 'news-row',
-              style: { animationDelay: `${i * 0.04}s` },
-              onClick: () => onItemClick(item)
-            },
-              React.createElement('div', { className: 'row-left' },
-                React.createElement('div', { className: 'row-meta' },
-                  React.createElement(Badge, { className: item.badge, label: item.badgeLabel }),
-                  React.createElement('span', { className: 'search-edition-tag' }, editionLabel)
-                ),
-                React.createElement('div', { className: 'row-headline' }, item.headline),
-                React.createElement('div', { className: 'row-summary' }, item.summary),
-                React.createElement('div', { className: 'row-footer' },
-                  React.createElement('span', { className: 'row-source' }, item.source),
-                  ' · ', item.date
-                )
+            e('div', { key: `${editionLabel}-${item.id}`, className: 'news-row', style: { animationDelay: `${i * 0.04}s` }, onClick: () => onItemClick(item) },
+              e('div', { className: 'row-left' },
+                e('div', { className: 'row-meta' }, e(Badge, { className: item.badge, label: item.badgeLabel }), e('span', { className: 'search-edition-tag' }, editionLabel)),
+                e('div', { className: 'row-headline' }, item.headline),
+                e('div', { className: 'row-summary' }, item.summary),
+                e('div', { className: 'row-footer' }, e('span', { className: 'row-source' }, item.source), ' · ', item.date)
               ),
-              React.createElement('div', { className: 'row-right' },
-                React.createElement(ImpactTag, { level: item.impact })
-              )
+              e('div', { className: 'row-right' }, e(ImpactTag, { level: item.impact }))
             )
           )
         )
   );
 }
 
+// ── Competition components ────────────────────────────────────────────────────
+function ChangelogEntry({ entry }) {
+  const impactClass = entry.impact === 'positive' ? 'change-positive' : entry.impact === 'negative' ? 'change-negative' : 'change-neutral';
+  const impactLabel = entry.impact === 'positive' ? '▲ Positive' : entry.impact === 'negative' ? '▼ Negative' : '◆ Neutral';
+  return e('div', { className: 'changelog-entry' },
+    e('span', { className: `change-impact ${impactClass}` }, impactLabel),
+    e('div', { className: 'change-text' },
+      entry.change,
+      e('div', { className: 'change-meta' }, entry.source, entry.date ? ` · ${entry.date}` : '')
+    )
+  );
+}
+
+function CompCard({ card }) {
+  const [open, setOpen] = useState(false);
+  const recentChangelog = (card.changelog || []).slice(0, 5);
+
+  const profileFields = [
+    { label: 'Joining Fee', val: card.joiningFee },
+    { label: 'Annual Fee', val: card.annualFee },
+    { label: 'Fee Waiver', val: card.feeWaiverThreshold },
+    { label: 'Primary Reward', val: card.primaryReward },
+    { label: 'Reward Cap', val: card.rewardCap },
+    { label: 'Lounge Access', val: card.loungeAccess },
+  ].filter(f => f.val);
+
+  return e('div', { className: 'comp-card' },
+    e('div', { className: 'comp-card-header', onClick: () => setOpen(!open) },
+      e('div', null,
+        e('div', { className: 'comp-card-name' }, card.name || card.id),
+        e('div', { className: 'comp-card-issuer' }, card.issuer || '')
+      ),
+      e('span', { className: `comp-card-chevron${open ? ' open' : ''}` }, '▾')
+    ),
+    open && e('div', { className: 'comp-card-body' },
+      profileFields.length > 0 && e('div', { className: 'profile-grid' },
+        profileFields.map(f => e('div', { key: f.label, className: 'profile-item' },
+          e('div', { className: 'profile-label' }, f.label),
+          e('div', { className: 'profile-value' }, f.val)
+        ))
+      ),
+      card.keyDifferentiator && e('div', { style: { fontSize: '0.82rem', color: 'var(--ink-muted)', marginBottom: '0.85rem', fontStyle: 'italic' } }, card.keyDifferentiator),
+      e('div', { className: 'changelog-heading' }, 'Recent changes'),
+      recentChangelog.length === 0
+        ? e('div', { className: 'changelog-empty' }, 'No changes recorded yet.')
+        : recentChangelog.map((entry, i) => e(ChangelogEntry, { key: i, entry }))
+    )
+  );
+}
+
+function QCRDetail({ qcr, onBack }) {
+  return e('div', { className: 'qcr-detail' },
+    e('button', { className: 'detail-back', onClick: onBack }, '← Back to competition'),
+    e('div', { style: { fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent)', fontWeight: 500, marginBottom: '0.4rem' } }, 'Quarterly Competition Report'),
+    e('h1', { className: 'detail-headline' }, `Pixel Competition · ${qcr.quarter}`),
+    e('div', { style: { fontSize: '0.75rem', color: 'var(--ink-faint)', paddingBottom: '1.2rem', borderBottom: '1px solid var(--rule)', marginBottom: '1.5rem' } }, `Generated ${new Date(qcr.generatedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`),
+    e('div', { className: 'qcr-narrative' }, qcr.narrative),
+    qcr.biggestMoves?.length > 0 && e('div', null,
+      e('div', { className: 'qcr-section-title' }, 'Biggest moves'),
+      qcr.biggestMoves.map((m, i) => e('div', { key: i, className: 'qcr-move' },
+        e('div', { className: 'qcr-move-card' }, m.card),
+        e('div', { className: 'qcr-move-text' }, m.move),
+        e('div', { className: 'qcr-implication' }, m.pixelImplication)
+      ))
+    ),
+    qcr.segmentTrends?.length > 0 && e('div', null,
+      e('div', { className: 'qcr-section-title', style: { marginTop: '1.25rem' } }, 'Segment trends'),
+      e('ul', { className: 'qcr-list' }, qcr.segmentTrends.map((t, i) => e('li', { key: i }, t)))
+    ),
+    qcr.pixelOpportunities?.length > 0 && e('div', null,
+      e('div', { className: 'qcr-section-title', style: { marginTop: '1.25rem' } }, 'Opportunities for Pixel'),
+      e('ul', { className: 'qcr-list' }, qcr.pixelOpportunities.map((t, i) => e('li', { key: i }, t)))
+    ),
+    qcr.pixelWatchPoints?.length > 0 && e('div', null,
+      e('div', { className: 'qcr-section-title', style: { marginTop: '1.25rem' } }, 'Watch points'),
+      e('ul', { className: 'qcr-list' }, qcr.pixelWatchPoints.map((t, i) => e('li', { key: i }, t)))
+    )
+  );
+}
+
+function CompetitionPage({ compData, onQCRClick }) {
+  const { cards = [], qcrs = [], lastUpdated } = compData;
+  const latestQCR = qcrs[0] || null;
+
+  return e('div', { className: 'comp-page' },
+    e('div', { className: 'comp-banner' },
+      e('div', { className: 'comp-title' }, 'Pixel Competition'),
+      e('div', { className: 'comp-subtitle' }, lastUpdated ? `Last updated ${lastUpdated}` : 'Updated every 4th Sunday')
+    ),
+    latestQCR && e('div', { className: 'qcr-banner', onClick: () => onQCRClick(latestQCR) },
+      e('div', { className: 'qcr-label' }, `Quarterly Competition Report · ${latestQCR.quarter}`),
+      e('div', { className: 'qcr-title' }, `Pixel vs Competition · ${latestQCR.quarter}`),
+      e('div', { className: 'qcr-preview' }, latestQCR.narrative)
+    ),
+    cards.length === 0
+      ? e('div', { className: 'empty-state' },
+          e('div', { className: 'empty-title' }, 'Competition data coming soon'),
+          e('p', null, 'Competitor profiles are updated every 4th Sunday. Check back after the first refresh.')
+        )
+      : cards.map(card => e(CompCard, { key: card.id || card.name, card }))
+  );
+}
+
 // ── Masthead ──────────────────────────────────────────────────────────────────
-function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch }) {
+function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch, activeTab }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
-
   useEffect(() => { if (searchOpen && inputRef.current) inputRef.current.focus(); }, [searchOpen]);
 
-  const SearchIcon = (size) => React.createElement('svg', {
-    viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round',
-    style: { width: size + 'px', height: size + 'px' }
-  },
-    React.createElement('circle', { cx: '6.5', cy: '6.5', r: '4' }),
-    React.createElement('line', { x1: '10', y1: '10', x2: '14', y2: '14' })
+  const SearchIcon = (size) => e('svg', { viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: '1.8', strokeLinecap: 'round', style: { width: size + 'px', height: size + 'px' } },
+    e('circle', { cx: '6.5', cy: '6.5', r: '4' }),
+    e('line', { x1: '10', y1: '10', x2: '14', y2: '14' })
   );
 
   function closeSearch() { setSearchOpen(false); setQuery(''); onSearch(''); }
+  function handleKey(ev) { if (ev.key === 'Enter' && query.trim()) onSearch(query.trim()); if (ev.key === 'Escape') closeSearch(); }
+  function handleChange(ev) { setQuery(ev.target.value); if (ev.target.value.trim().length >= 2) onSearch(ev.target.value.trim()); else if (!ev.target.value.trim()) onSearch(''); }
 
-  function handleKey(e) {
-    if (e.key === 'Enter' && query.trim()) onSearch(query.trim());
-    if (e.key === 'Escape') closeSearch();
-  }
-
-  function handleChange(e) {
-    setQuery(e.target.value);
-    if (e.target.value.trim().length >= 2) onSearch(e.target.value.trim());
-    else if (e.target.value.trim() === '') onSearch('');
-  }
-
-  const searchBar = React.createElement('div', { className: 'search-bar' },
-    React.createElement('input', { ref: inputRef, className: 'search-input', type: 'text', placeholder: 'Search all editions…', value: query, onChange: handleChange, onKeyDown: handleKey }),
-    React.createElement('button', { className: 'search-close', onClick: closeSearch }, '×')
+  const searchBar = e('div', { className: 'search-bar' },
+    e('input', { ref: inputRef, className: 'search-input', type: 'text', placeholder: 'Search news…', value: query, onChange: handleChange, onKeyDown: handleKey }),
+    e('button', { className: 'search-close', onClick: closeSearch }, '×')
   );
 
-  const editionDropdown = editions.length > 0 && React.createElement('div', { className: 'edition-selector' },
-    React.createElement('span', { className: 'edition-label' }, 'Edition'),
-    React.createElement('select', {
-      className: 'edition-select',
-      value: editionId,
-      onChange: e => onEditionChange(e.target.value)
-    },
-      editions.map(e => React.createElement('option', { key: e.id, value: e.id }, e.label))
-    )
-  );
-
-  return React.createElement('header', { className: 'masthead' },
-    React.createElement('div', { className: 'masthead-top' },
-      React.createElement('div', { className: 'logo-area' },
-        React.createElement('div', { className: 'logo', onClick: () => { closeSearch(); onLogoClick(); } },
-          'Pixie', React.createElement('span', null, ' Times')
-        ),
-        React.createElement('div', { className: 'logo-tagline' }, 'Credit · Payments · Regulation')
+  return e('header', { className: 'masthead' },
+    e('div', { className: 'masthead-top' },
+      e('div', { className: 'logo-area' },
+        e('div', { className: 'logo', onClick: () => { closeSearch(); onLogoClick(); } }, 'Pixie', e('span', null, ' Times')),
+        e('div', { className: 'logo-tagline' }, 'Credit · Payments · Regulation')
       ),
-      React.createElement('div', { className: 'masthead-right' },
-        React.createElement('div', { className: 'masthead-controls' },
+      e('div', { className: 'masthead-right' },
+        e('div', { className: 'masthead-controls' },
           searchOpen
             ? searchBar
-            : React.createElement(React.Fragment, null,
-                // Desktop: text button with label
-                React.createElement('button', { className: 'search-btn', onClick: () => setSearchOpen(true) },
-                  SearchIcon(13), 'Search'
-                ),
-                // Mobile: icon-only button (shown via CSS)
-                React.createElement('button', { className: 'search-icon-btn', onClick: () => setSearchOpen(true) },
-                  SearchIcon(18)
-                ),
-                editionDropdown
+            : e(React.Fragment, null,
+                e('button', { className: 'search-btn', onClick: () => setSearchOpen(true) }, SearchIcon(13), 'Search'),
+                e('button', { className: 'search-icon-btn', onClick: () => setSearchOpen(true) }, SearchIcon(18)),
+                activeTab === 'news' && editions.length > 0 && e('div', { className: 'edition-selector' },
+                  e('span', { className: 'edition-label' }, 'Edition'),
+                  e('select', { className: 'edition-select', value: editionId, onChange: ev => onEditionChange(ev.target.value) },
+                    editions.map(ed => e('option', { key: ed.id, value: ed.id }, ed.label))
+                  )
+                )
               )
         ),
-        React.createElement('div', { className: 'refresh-info' },
-          'Next edition ', React.createElement('strong', null, getNextRefreshDate())
-        )
+        e('div', { className: 'refresh-info' }, 'Next edition ', e('strong', null, getNextRefreshDate()))
       )
     )
   );
@@ -495,18 +563,12 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch 
 
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer({ onSubscribe }) {
-  return React.createElement('footer', { className: 'site-footer' },
-    React.createElement('div', { className: 'footer-inner' },
-      React.createElement('div', { className: 'footer-left' },
-        React.createElement('div', { className: 'footer-copy' },
-          'Pixie Times · Credit card industry intelligence · Refreshes every Monday 12am IST'
-        )
-      ),
-      React.createElement('div', { className: 'footer-subscribe' },
-        React.createElement('span', { className: 'footer-subscribe-text' },
-          'Get this in your inbox every Monday.'
-        ),
-        React.createElement('button', { className: 'subscribe-cta', onClick: onSubscribe }, 'Subscribe')
+  return e('footer', { className: 'site-footer' },
+    e('div', { className: 'footer-inner' },
+      e('div', { className: 'footer-copy' }, 'Pixie Times · Refreshes every Monday 12am IST'),
+      e('div', { className: 'footer-subscribe' },
+        e('span', { className: 'footer-subscribe-text' }, 'Get this in your inbox every Monday.'),
+        e('button', { className: 'subscribe-cta', onClick: onSubscribe }, 'Subscribe')
       )
     )
   );
@@ -522,6 +584,10 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSubscribe, setShowSubscribe] = useState(false);
   const [toast, setToast] = useState('');
+  const [activeTab, setActiveTab] = useState('news'); // 'news' | 'competition'
+  const [compData, setCompData] = useState(null);
+  const [compLoading, setCompLoading] = useState(false);
+  const [selectedQCR, setSelectedQCR] = useState(null);
 
   async function loadEditions() {
     setLoading(true); setError(null);
@@ -536,95 +602,90 @@ function App() {
     finally { setLoading(false); }
   }
 
-  useEffect(() => { loadEditions(); }, []);
-
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(''), 2500);
+  async function loadCompetition() {
+    if (compData) return; // already loaded
+    setCompLoading(true);
+    try {
+      const res = await fetch('/api/competition');
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+      setCompData(data);
+    } catch (err) { setCompData({ cards: [], qcrs: [], error: err.message }); }
+    finally { setCompLoading(false); }
   }
 
-  const edition = editions.find(e => e.id === editionId);
+  useEffect(() => { loadEditions(); }, []);
+  useEffect(() => { if (activeTab === 'competition') loadCompetition(); }, [activeTab]);
+
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(''), 2500); }
+
+  const edition = editions.find(ed => ed.id === editionId);
   const isSearching = searchQuery.trim().length >= 2;
 
   const mastheadProps = {
-    editions, editionId,
+    editions, editionId, activeTab,
     onEditionChange: id => { setEditionId(id); setDetailItem(null); setSearchQuery(''); },
-    onLogoClick: () => { setDetailItem(null); setSearchQuery(''); },
+    onLogoClick: () => { setDetailItem(null); setSearchQuery(''); setSelectedQCR(null); },
     onSearch: setSearchQuery,
   };
 
-  const footer = React.createElement(Footer, {
-    onSubscribe: () => setShowSubscribe(true),
-  });
-
-  const modals = React.createElement(React.Fragment, null,
-    showSubscribe && React.createElement(SubscribeModal, { onClose: () => setShowSubscribe(false), onSuccess: showToast }),
-    toast && React.createElement(Toast, { message: toast })
+  const footer = e(Footer, { onSubscribe: () => setShowSubscribe(true) });
+  const modals = e(React.Fragment, null,
+    showSubscribe && e(SubscribeModal, { onClose: () => setShowSubscribe(false), onSuccess: showToast }),
+    toast && e(Toast, { message: toast })
   );
 
-  if (loading) return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
-    React.createElement('div', { className: 'state-center' },
-      React.createElement('div', { className: 'spinner' }),
-      React.createElement('p', null, 'Loading this week\'s edition…')
-    ), footer, modals
+  // Pill tabs strip (shown on both tabs, not in search/detail)
+  const pillTabs = e('div', { className: 'pill-tabs' },
+    e('button', { className: `pill-tab${activeTab === 'news' ? ' active' : ''}`, onClick: () => { setActiveTab('news'); setDetailItem(null); setSearchQuery(''); setSelectedQCR(null); } }, 'News'),
+    e('button', { className: `pill-tab competition${activeTab === 'competition' ? ' active' : ''}`, onClick: () => { setActiveTab('competition'); setDetailItem(null); setSearchQuery(''); } }, 'Pixel Competition')
   );
 
-  if (error) return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
-    React.createElement('div', { className: 'state-center' },
-      React.createElement('p', null, 'Could not load editions. The first edition will be ready after the Sunday refresh.'),
-      React.createElement('button', { className: 'retry-btn', onClick: loadEditions }, 'Try again')
-    ), footer, modals
-  );
+  if (loading) return e(React.Fragment, null, e(Masthead, { ...mastheadProps, editions: [] }), e('div', { className: 'state-center' }, e('div', { className: 'spinner' }), e('p', null, "Loading…")), footer, modals);
+  if (error) return e(React.Fragment, null, e(Masthead, { ...mastheadProps, editions: [] }), e('div', { className: 'state-center' }, e('p', null, 'Could not load editions.'), e('button', { className: 'retry-btn', onClick: loadEditions }, 'Try again')), footer, modals);
 
-  if (editions.length === 0) return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, { ...mastheadProps, editions: [] }),
-    React.createElement('div', { className: 'empty-state' },
-      React.createElement('div', { className: 'empty-title' }, 'First edition coming soon'),
-      React.createElement('p', null, 'Pixie Times refreshes every Monday at 12am IST.')
-    ), footer, modals
-  );
+  // Competition tab
+  if (activeTab === 'competition') {
+    return e(React.Fragment, null,
+      e(Masthead, mastheadProps),
+      pillTabs,
+      selectedQCR
+        ? e(QCRDetail, { qcr: selectedQCR, onBack: () => setSelectedQCR(null) })
+        : compLoading
+          ? e('div', { className: 'state-center' }, e('div', { className: 'spinner' }), e('p', null, 'Loading competition data…'))
+          : e(CompetitionPage, { compData: compData || { cards: [], qcrs: [] }, onQCRClick: setSelectedQCR }),
+      footer, modals
+    );
+  }
 
-  if (edition && edition.news.length === 0 && !isSearching) return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, mastheadProps),
-    React.createElement('div', { className: 'empty-state' },
-      React.createElement('div', { className: 'empty-title' }, 'Nothing to report this week'),
-      React.createElement('p', null,
-        'No credit card, UPI, or RBI news met our relevance bar this week.',
-        React.createElement('br'), 'Check back next Monday for a fresh edition.'
-      )
-    ), footer, modals
-  );
+  // News tab — empty
+  if (editions.length === 0) return e(React.Fragment, null, e(Masthead, mastheadProps), pillTabs, e('div', { className: 'empty-state' }, e('div', { className: 'empty-title' }, 'First edition coming soon'), e('p', null, 'Refreshes every Monday at 12am IST.')), footer, modals);
 
-  return React.createElement(React.Fragment, null,
-    React.createElement(Masthead, mastheadProps),
+  if (edition && edition.news.length === 0 && !isSearching) return e(React.Fragment, null, e(Masthead, mastheadProps), pillTabs, e('div', { className: 'empty-state' }, e('div', { className: 'empty-title' }, 'Nothing to report this week'), e('p', null, 'No relevant news met our bar this week. Check back next Monday.')), footer, modals);
+
+  // News tab — content
+  return e(React.Fragment, null,
+    e(Masthead, mastheadProps),
+    !detailItem && !isSearching && pillTabs,
     detailItem
-      ? React.createElement(DetailPage, { item: detailItem, onBack: () => setDetailItem(null) })
+      ? e(DetailPage, { item: detailItem, onBack: () => setDetailItem(null) })
       : isSearching
-        ? React.createElement(SearchPage, { query: searchQuery, editions, onItemClick: setDetailItem })
-        : edition && React.createElement('main', { className: 'page' },
-            React.createElement('div', { className: 'edition-banner' },
-              React.createElement('div', { className: 'edition-title' },
-                edition.isCurrent ? 'This week in credit' : `Edition · ${edition.label}`
-              ),
-              React.createElement('div', { className: 'edition-right' },
-                !edition.isCurrent && React.createElement('span', { className: 'past-chip' }, 'Past edition'),
-                React.createElement('span', { className: 'edition-stories' }, `${edition.news.length} stories`)
+        ? e(SearchPage, { query: searchQuery, editions, onItemClick: setDetailItem })
+        : edition && e('main', { className: 'page' },
+            e('div', { className: 'edition-banner' },
+              e('div', { className: 'edition-title' }, edition.isCurrent ? 'This week in credit' : `Edition · ${edition.label}`),
+              e('div', { className: 'edition-right' },
+                !edition.isCurrent && e('span', { className: 'past-chip' }, 'Past edition'),
+                e('span', { className: 'edition-stories' }, `${edition.news.length} stories`)
               )
             ),
-            React.createElement('div', { className: 'news-list' },
-              edition.news.map(item =>
-                React.createElement(NewsRow, { key: item.id, item, onClick: setDetailItem })
-              )
-            )
+            e('div', { className: 'news-list' }, edition.news.map(item => e(NewsRow, { key: item.id, item, onClick: setDetailItem })))
           ),
-    footer,
-    modals
+    footer, modals
   );
 }
 
-ReactDOM.render(React.createElement(App), document.getElementById('root'));
+ReactDOM.render(e(App), document.getElementById('root'));
 </script>
 </body>
 </html>
