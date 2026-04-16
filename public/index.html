@@ -53,7 +53,8 @@
   .refresh-info strong { color: var(--ink-muted); font-weight: 500; }
 
   /* ── Pill tabs ── */
-  .pill-tabs { display: flex; align-items: center; gap: 6px; padding: 0.55rem 2rem; border-top: 1px solid var(--rule); }
+  .pill-tabs { display: flex; align-items: center; gap: 6px; padding: 0.55rem 2rem; border-top: 1px solid var(--rule); position: sticky; top: var(--masthead-height, 72px); background: var(--paper); z-index: 99; box-shadow: 0 1px 0 var(--rule); }
+  .pill-tabs-inner { display: flex; gap: 6px; max-width: 820px; width: 100%; }
   .pill-tab { font-family: var(--font-body); font-size: 0.75rem; font-weight: 500; padding: 4px 14px; border-radius: 20px; border: 1px solid var(--rule); background: none; cursor: pointer; color: var(--ink-muted); transition: all 0.15s; white-space: nowrap; }
   .pill-tab:hover { border-color: var(--ink-faint); color: var(--ink); }
   .pill-tab.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
@@ -257,7 +258,7 @@
 
   @media (max-width: 540px) {
     .masthead-top { padding: 0.65rem 1rem; }
-    .pill-tabs { padding: 0.45rem 1rem; }
+    .pill-tabs { padding: 0.45rem 1rem; top: 62px; }
     .row-right { display: none; }
     .page, .comp-page, .search-page, .qcr-detail { padding: 1.25rem 1rem 2rem; }
     .detail-wrap { padding: 1.25rem 1rem 2rem; }
@@ -637,8 +638,10 @@ function App() {
 
   // Pill tabs strip (shown on both tabs, not in search/detail)
   const pillTabs = e('div', { className: 'pill-tabs' },
-    e('button', { className: `pill-tab${activeTab === 'news' ? ' active' : ''}`, onClick: () => { setActiveTab('news'); setDetailItem(null); setSearchQuery(''); setSelectedQCR(null); } }, 'News'),
-    e('button', { className: `pill-tab competition${activeTab === 'competition' ? ' active' : ''}`, onClick: () => { setActiveTab('competition'); setDetailItem(null); setSearchQuery(''); } }, 'Pixel Competition')
+    e('div', { className: 'pill-tabs-inner' },
+      e('button', { className: `pill-tab${activeTab === 'news' ? ' active' : ''}`, onClick: () => { setActiveTab('news'); setDetailItem(null); setSearchQuery(''); setSelectedQCR(null); } }, 'News'),
+      e('button', { className: `pill-tab competition${activeTab === 'competition' ? ' active' : ''}`, onClick: () => { setActiveTab('competition'); setDetailItem(null); setSearchQuery(''); } }, 'Pixel Competition')
+    )
   );
 
   if (loading) return e(React.Fragment, null, e(Masthead, { ...mastheadProps, editions: [] }), e('div', { className: 'state-center' }, e('div', { className: 'spinner' }), e('p', null, "Loading…")), footer, modals);
@@ -666,7 +669,7 @@ function App() {
   // News tab — content
   return e(React.Fragment, null,
     e(Masthead, mastheadProps),
-    !detailItem && !isSearching && pillTabs,
+    pillTabs,
     detailItem
       ? e(DetailPage, { item: detailItem, onBack: () => setDetailItem(null) })
       : isSearching
