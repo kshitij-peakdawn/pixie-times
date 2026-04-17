@@ -169,11 +169,12 @@
   .comp-table th { background: var(--paper-warm); font-family: var(--font-body); font-size: 0.65rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-muted); padding: 0.65rem 0.85rem; text-align: left; border-bottom: 1.5px solid var(--rule); white-space: nowrap; }
   .comp-table th:first-child { background: #eae4d8; color: var(--ink); min-width: 160px; border-right: 1.5px solid var(--rule); }
   .comp-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--paper-warm); vertical-align: top; color: var(--ink-muted); line-height: 1.4; }
-  .comp-table td:first-child { background: var(--paper-warm); font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 0.82rem; border-right: 1.5px solid var(--rule); position: sticky; left: 0; z-index: 1; }
+  .comp-table td:first-child { background: var(--paper-warm); font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 0.82rem; border-right: 1.5px solid var(--rule); border-bottom: 1px solid #c5bbb0; position: sticky; left: 0; z-index: 1; }
   .comp-table tr:last-child td { border-bottom: none; }
   .comp-table tr:hover td { background: #f5f0e8; }
   .comp-table tr:hover td:first-child { background: #ece6da; }
   .comp-card-issuer-small { display: block; font-family: var(--font-body); font-size: 0.68rem; font-weight: 400; color: var(--ink-faint); margin-top: 2px; }
+  .comp-card-userbase { display: block; font-family: var(--font-body); font-size: 0.65rem; font-weight: 400; color: var(--ink-faint); margin-top: 1px; letter-spacing: 0.02em; }
   .comp-null { color: var(--ink-faint); font-style: italic; font-size: 0.75rem; }
 
   /* Changelog */
@@ -427,20 +428,19 @@ function CompTable({ cards }) {
     return v ? v : e('span', { className: 'comp-null' }, '—');
   }
   const COLS = [
-    { key: 'keyDifferentiator', label: 'USP' },
-    { key: 'joiningFee',        label: 'Joining Fee' },
-    { key: 'annualFee',         label: 'Annual Fee' },
-    { key: 'feeWaiverThreshold',label: 'Fee Waiver' },
-    { key: 'primaryReward',     label: 'Primary Reward' },
-    { key: 'rewardCap',         label: 'Reward Cap' },
-    { key: 'loungeAccess',      label: 'Lounge' },
+    { key: 'keyDifferentiator', label: 'Card Summary', narrow: false },
+    { key: 'joiningFee',        label: 'Joining Fee',  narrow: true  },
+    { key: 'annualFee',         label: 'Annual Fee',   narrow: true  },
+    { key: 'feeWaiverThreshold',label: 'Fee Waiver',   narrow: true  },
+    { key: 'primaryReward',     label: 'Primary Reward', narrow: false },
+    { key: 'rewardCap',         label: 'Reward Cap',   narrow: false },
   ];
   return e('div', { className: 'comp-table-wrap' },
     e('table', { className: 'comp-table' },
       e('thead', null,
         e('tr', null,
           e('th', null, 'Card'),
-          COLS.map(c => e('th', { key: c.key }, c.label))
+          COLS.map(c => e('th', { key: c.key, style: c.narrow ? { width: '80px', minWidth: '72px', whiteSpace: 'normal' } : {} }, c.label))
         )
       ),
       e('tbody', null,
@@ -448,9 +448,10 @@ function CompTable({ cards }) {
           e('tr', { key: card.id || card.name },
             e('td', null,
               card.name || card.id,
-              e('span', { className: 'comp-card-issuer-small' }, card.issuer || '')
+              e('span', { className: 'comp-card-issuer-small' }, card.issuer || ''),
+              e('span', { className: 'comp-card-userbase' }, ({"amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || '')
             ),
-            COLS.map(c => e('td', { key: c.key }, val(card[c.key])))
+            COLS.map(c => e('td', { key: c.key, style: c.narrow ? { width: '80px' } : {} }, val(card[c.key])))
           )
         )
       )
@@ -558,9 +559,9 @@ function Masthead({ editions, editionId, onEditionChange, onLogoClick, onSearch,
             : e(React.Fragment, null,
                 e('button', { className: 'search-btn', onClick: () => setSearchOpen(true) }, SearchIcon(13), 'Search'),
                 e('button', { className: 'search-icon-btn', onClick: () => setSearchOpen(true) }, SearchIcon(18)),
-                activeTab === 'news' && editions.length > 0 && e('div', { className: 'edition-selector' },
+                editions.length > 0 && e('div', { className: 'edition-selector' },
                   e('span', { className: 'edition-label' }, 'Edition'),
-                  e('select', { className: 'edition-select', value: editionId, onChange: ev => onEditionChange(ev.target.value) },
+                  e('select', { className: 'edition-select', value: editionId, onChange: ev => { onEditionChange(ev.target.value); } },
                     editions.map(ed => e('option', { key: ed.id, value: ed.id }, ed.label))
                   )
                 )
