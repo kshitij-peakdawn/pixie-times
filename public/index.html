@@ -341,7 +341,7 @@ function SubscribeModal({ onClose, onSuccess }) {
         ),
         e('label', { className: 'modal-check' },
           e('input', { type: 'checkbox', checked: competition, onChange: ev => setCompetition(ev.target.checked) }),
-          e('span', { className: 'modal-check-label' }, 'Monthly Competition Overview', e('span', { className: 'modal-check-sub' }, 'Every 1st of the month — Pixel vs competitor moves'))
+          e('span', { className: 'modal-check-label' }, 'Monthly Competition Overview', e('span', { className: 'modal-check-sub' }, '1st of every month — Pixel vs competitor moves'))
         )
       ),
       e('div', { className: 'modal-error' }, error),
