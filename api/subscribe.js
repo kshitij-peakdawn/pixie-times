@@ -1,14 +1,4 @@
-import { createClient } from "redis";
-
-let client;
-async function getClient() {
-  if (!client) {
-    client = createClient({ url: process.env.REDIS_URL });
-    client.on("error", (err) => console.error("Redis error:", err));
-    await client.connect();
-  }
-  return client;
-}
+import { getRedisClient } from "./_lib/redis.js";
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -36,7 +26,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const redis = await getClient();
+    const redis = await getRedisClient();
     const normalised = email.toLowerCase().trim();
     const key = `subscriber:${normalised}`;
 

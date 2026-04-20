@@ -1,14 +1,4 @@
-import { createClient } from "redis";
-
-let client;
-async function getClient() {
-  if (!client) {
-    client = createClient({ url: process.env.REDIS_URL });
-    client.on("error", (err) => console.error("Redis error:", err));
-    await client.connect();
-  }
-  return client;
-}
+import { getRedisClient } from "./_lib/redis.js";
 
 const TRACKED_CARDS = [
   { id: "amazon-pay-icici",    name: "Amazon Pay Credit Card",  issuer: "ICICI Bank" },
@@ -26,7 +16,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    const redis = await getClient();
+    const redis = await getRedisClient();
 
     // Fetch all card profiles and changelogs
     const cards = await Promise.all(

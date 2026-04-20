@@ -1,15 +1,5 @@
-import { createClient } from "redis";
 import { requireAuthorizedRequest } from "./_lib/auth.js";
-
-let client;
-async function getClient() {
-  if (!client) {
-    client = createClient({ url: process.env.REDIS_URL });
-    client.on("error", (err) => console.error("Redis error:", err));
-    await client.connect();
-  }
-  return client;
-}
+import { getRedisClient } from "./_lib/redis.js";
 
 const MAX_EDITIONS = 10;
 const MAX_STORIES = 10;
@@ -274,7 +264,7 @@ ${articleList}`;
 
 // ── Step 3: Save to Redis ──────────────────────────────────────────────────
 async function saveEdition(stories) {
-  const redis = await getClient();
+  const redis = await getRedisClient();
   const now = new Date();
   const id = getWeekId(now);
   const label = getEditionLabel(now);
