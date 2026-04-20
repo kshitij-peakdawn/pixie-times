@@ -11,7 +11,7 @@ async function getClient() {
 }
 
 export default async function handler(req, res) {
-  const { email } = req.query;
+  const { email, list } = req.query;
 
   if (!email) {
     return res.status(400).send(page("Invalid link", "No email address provided in this unsubscribe link."));
@@ -20,11 +20,50 @@ export default async function handler(req, res) {
   try {
     const redis = await getClient();
     const normalised = decodeURIComponent(email).toLowerCase().trim();
-    await redis.sRem("subscribers", normalised);
+
+    if (list === "competition") {
+      // Unsubscribe from competition only
+      await redis.sRem("subscribers:competition", normalised);
+      const key = `subscriber:${normalised}`;
+      const existing = await redis.get(key);
+      if (existing) {
+        const data = JSON.parse(existing);
+        data.competition = false;
+        data.updatedAt = new Date().toISOString();
+        await redis.set(key, JSON.stringify(data));
+      }
+      return res.status(200).send(page(
+        "Unsubscribed from Competition Overview",
+        `<strong>${normalised}</strong> has been removed from the monthly Pixel Competition Overview.<br/>You will still receive the weekly news digest.`
+      ));
+    }
+
+    if (list === "news") {
+      // Unsubscribe from news only
+      await redis.sRem("subscribers:news", normalised);
+      const key = `subscriber:${normalised}`;
+      const existing = await redis.get(key);
+      if (existing) {
+        const data = JSON.parse(existing);
+        data.news = false;
+        data.updatedAt = new Date().toISOString();
+        await redis.set(key, JSON.stringify(data));
+      }
+      return res.status(200).send(page(
+        "Unsubscribed from News Digest",
+        `<strong>${normalised}</strong> has been removed from the weekly news digest.<br/>You will still receive the monthly competition overview.`
+      ));
+    }
+
+    // No list param = unsubscribe from everything
+    await redis.sRem("subscribers:news", normalised);
+    await redis.sRem("subscribers:competition", normalised);
+    await redis.sRem("subscribers", normalised); // legacy flat set cleanup
+    await redis.del(`subscriber:${normalised}`);
 
     return res.status(200).send(page(
       "Unsubscribed",
-      `<strong>${normalised}</strong> has been removed from Pixie Times.<br/>You won't receive any more emails from us.`
+      `<strong>${normalised}</strong> has been removed from all Pixie Times emails.<br/>You won't receive any more emails from us.`
     ));
   } catch (err) {
     console.error("unsubscribe error:", err);
