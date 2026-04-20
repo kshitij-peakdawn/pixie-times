@@ -21,9 +21,18 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { email, lists = { news: true, competition: true } } = req.body;
+  const { email, lists } = req.body;
+
   if (!email || !isValidEmail(email)) {
     return res.status(400).json({ error: "Invalid email address" });
+  }
+
+  // Default both to true if not provided
+  const wantsNews        = lists?.news        !== false;
+  const wantsCompetition = lists?.competition !== false;
+
+  if (!wantsNews && !wantsCompetition) {
+    return res.status(400).json({ error: "Please select at least one newsletter." });
   }
 
   try {
@@ -31,38 +40,35 @@ export default async function handler(req, res) {
     const normalised = email.toLowerCase().trim();
     const key = `subscriber:${normalised}`;
 
-    // Check if already exists
     const existing = await redis.get(key);
     const existingData = existing ? JSON.parse(existing) : null;
 
-    if (existingData) {
-      // Merge preferences — union of existing and new selections
-      const merged = {
-        news: existingData.news || lists.news,
-        competition: existingData.competition || lists.competition,
-        subscribedAt: existingData.subscribedAt,
-        updatedAt: new Date().toISOString(),
-      };
-      await redis.set(key, JSON.stringify(merged));
+    const data = {
+      news:        wantsNews,
+      competition: wantsCompetition,
+      subscribedAt: existingData?.subscribedAt || new Date().toISOString(),
+      updatedAt:   new Date().toISOString(),
+    };
 
-      // Update list sets
-      if (merged.news) await redis.sAdd("subscribers:news", normalised);
-      if (merged.competition) await redis.sAdd("subscribers:competition", normalised);
+    // Save preference record
+    await redis.set(key, JSON.stringify(data));
 
-      return res.status(200).json({ message: "already_subscribed", lists: merged });
+    // Sync news set
+    if (data.news) {
+      await redis.sAdd("subscribers:news", normalised);
+    } else {
+      await redis.sRem("subscribers:news", normalised);
     }
 
-    // New subscriber
-    const data = {
-      news: lists.news === true,
-      competition: lists.competition === true,
-      subscribedAt: new Date().toISOString(),
-    };
-    await redis.set(key, JSON.stringify(data));
-    if (data.news) await redis.sAdd("subscribers:news", normalised);
-    if (data.competition) await redis.sAdd("subscribers:competition", normalised);
+    // Sync competition set — always write both add and remove to be explicit
+    if (data.competition) {
+      await redis.sAdd("subscribers:competition", normalised);
+    } else {
+      await redis.sRem("subscribers:competition", normalised);
+    }
 
-    return res.status(200).json({ message: "subscribed", lists: data });
+    const message = existingData ? "already_subscribed" : "subscribed";
+    return res.status(200).json({ message, lists: data });
   } catch (err) {
     console.error("subscribe error:", err);
     return res.status(500).json({ error: err.message });
