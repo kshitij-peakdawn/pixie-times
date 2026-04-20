@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { requireAuthorizedRequest } from "./_lib/auth.js";
 
 let client;
 async function getClient() {
@@ -321,7 +322,8 @@ async function saveEdition(stories) {
 
 // ── Main handler ───────────────────────────────────────────────────────────
 export default async function handler(req, res) {
-  // auth temporarily disabled for launch test
+  if (!requireAuthorizedRequest(req, res)) return;
+
   try {
     console.log("Step 1: Fetching articles from RSS feeds...");
     const articles = await fetchArticles();
