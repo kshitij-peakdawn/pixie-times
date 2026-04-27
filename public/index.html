@@ -167,7 +167,7 @@
   .comp-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 1.5rem; border: 1px solid var(--rule); border-radius: 6px; }
   .comp-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 700px; }
   .comp-table th { background: var(--paper-warm); font-family: var(--font-body); font-size: 0.65rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-muted); padding: 0.65rem 0.85rem; text-align: left; border-bottom: 1.5px solid var(--rule); white-space: nowrap; }
-  .comp-table th:first-child { background: #eae4d8; color: var(--ink); min-width: 160px; border-right: 1.5px solid var(--rule); }
+  .comp-table th:first-child { background: #eae4d8; color: var(--ink); min-width: 192px; border-right: 1.5px solid var(--rule); }
   .comp-table td { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--paper-warm); vertical-align: top; color: var(--ink-muted); line-height: 1.4; }
   .comp-table td:first-child { background: var(--paper-warm); font-family: var(--font-display); font-weight: 600; color: var(--ink); font-size: 0.82rem; border-right: 1.5px solid var(--rule); border-bottom: 1px solid #c5bbb0; position: sticky; left: 0; z-index: 1; }
   .comp-table tr:last-child td { border-bottom: none; }
@@ -175,6 +175,7 @@
   .comp-table tr:hover td:first-child { background: #ece6da; }
   .comp-card-issuer-small { display: block; font-family: var(--font-body); font-size: 0.68rem; font-weight: 400; color: var(--ink-faint); margin-top: 2px; }
   .comp-card-userbase { display: block; font-family: var(--font-body); font-size: 0.65rem; font-weight: 400; color: var(--ink-faint); margin-top: 1px; letter-spacing: 0.02em; }
+  .comp-card-summary { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--ink-muted); margin-top: 6px; line-height: 1.4; font-style: italic; padding-top: 5px; border-top: 1px solid #d5ccbf; }
   .comp-null { color: var(--ink-faint); font-style: italic; font-size: 0.75rem; }
 
   /* Changelog */
@@ -428,18 +429,17 @@ function CompTable({ cards }) {
     return v ? v : e('span', { className: 'comp-null' }, '—');
   }
   const COLS = [
-    { key: 'keyDifferentiator', label: 'Card Summary', narrow: false },
-    { key: 'joiningFee',        label: 'Joining Fee',  narrow: true  },
-    { key: 'annualFee',         label: 'Annual Fee',   narrow: true  },
-    { key: 'feeWaiverThreshold',label: 'Fee Waiver',   narrow: true  },
+    { key: 'joiningFee',        label: 'Joining Fee',    narrow: true  },
+    { key: 'annualFee',         label: 'Annual Fee',     narrow: true  },
+    { key: 'feeWaiverThreshold',label: 'Fee Waiver',     narrow: true  },
     { key: 'primaryReward',     label: 'Primary Reward', narrow: false },
-    { key: 'rewardCap',         label: 'Reward Cap',   narrow: false },
+    { key: 'rewardCap',         label: 'Reward Cap',     narrow: false },
   ];
   return e('div', { className: 'comp-table-wrap' },
     e('table', { className: 'comp-table' },
       e('thead', null,
         e('tr', null,
-          e('th', null, 'Card'),
+          e('th', null, 'Card & Summary'),
           COLS.map(c => e('th', { key: c.key, style: c.narrow ? { width: '80px', minWidth: '72px', whiteSpace: 'normal' } : {} }, c.label))
         )
       ),
@@ -449,7 +449,8 @@ function CompTable({ cards }) {
             e('td', null,
               card.name || card.id,
               e('span', { className: 'comp-card-issuer-small' }, card.issuer || ''),
-              e('span', { className: 'comp-card-userbase' }, ({"amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || '')
+              e('span', { className: 'comp-card-userbase' }, ({"amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || ''),
+              card.keyDifferentiator && e('span', { className: 'comp-card-summary' }, card.keyDifferentiator)
             ),
             COLS.map(c => e('td', { key: c.key, style: c.narrow ? { width: '80px' } : {} }, val(card[c.key])))
           )
