@@ -1,4 +1,14 @@
-import { getRedisClient } from "./_lib/redis.js";
+import { createClient } from "redis";
+
+let client;
+async function getClient() {
+  if (!client) {
+    client = createClient({ url: process.env.REDIS_URL });
+    client.on("error", (err) => console.error("Redis error:", err));
+    await client.connect();
+  }
+  return client;
+}
 
 export default async function handler(req, res) {
   const secret = req.headers["x-refresh-secret"];
@@ -7,7 +17,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const redis = await getRedisClient();
+    const redis = await getClient();
     const list = req.query.list || "news"; // "news" or "competition"
     const validLists = ["news", "competition"];
     if (!validLists.includes(list)) {
