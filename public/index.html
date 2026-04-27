@@ -175,7 +175,7 @@
   .comp-table tr:hover td:first-child { background: #ece6da; }
   .comp-card-issuer-small { display: block; font-family: var(--font-body); font-size: 0.68rem; font-weight: 400; color: var(--ink-faint); margin-top: 2px; }
   .comp-card-userbase { display: block; font-family: var(--font-body); font-size: 0.65rem; font-weight: 400; color: var(--ink-faint); margin-top: 1px; letter-spacing: 0.02em; }
-  .comp-card-summary { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--ink-muted); margin-top: 6px; line-height: 1.4; font-style: italic; padding-top: 5px; border-top: 1px solid #d5ccbf; }
+  .comp-card-summary { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--ink-muted); margin-top: 5px; line-height: 1.4; }
   .comp-null { color: var(--ink-faint); font-style: italic; font-size: 0.75rem; }
 
   /* Changelog */
@@ -448,7 +448,6 @@ function CompTable({ cards }) {
           e('tr', { key: card.id || card.name },
             e('td', null,
               card.name || card.id,
-              e('span', { className: 'comp-card-issuer-small' }, card.issuer || ''),
               e('span', { className: 'comp-card-userbase' }, ({"amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || ''),
               card.keyDifferentiator && e('span', { className: 'comp-card-summary' }, card.keyDifferentiator)
             ),
