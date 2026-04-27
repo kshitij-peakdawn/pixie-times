@@ -1,5 +1,4 @@
 import { createClient } from "redis";
-import { requireAuthorizedRequest } from "./_lib/auth.js";
 
 let client;
 async function getClient() {
@@ -268,7 +267,13 @@ async function saveUpdates(redis, cardUpdates, qcr) {
 }
 
 export default async function handler(req, res) {
-  if (!requireAuthorizedRequest(req, res)) return;
+  // No self-skip logic — cron handles timing (1st of month 00:01 IST)
+  // Manual trigger allowed with secret header
+  const secret = req.headers["x-refresh-secret"];
+  const isManual = secret === process.env.REFRESH_SECRET;
+  if (req.method === "POST" && !isManual) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
   try {
     const redis = await getClient();
