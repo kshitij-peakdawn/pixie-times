@@ -11,6 +11,7 @@ async function getClient() {
 }
 
 const TRACKED_CARDS = [
+  { id: "pixel-hdfc",          name: "Pixel Play",               issuer: "HDFC Bank",          isOwnCard: true },
   { id: "amazon-pay-icici",    name: "Amazon Pay Credit Card",  issuer: "ICICI Bank" },
   { id: "simplyclick-sbi",     name: "SBI SimplyCLICK",         issuer: "SBI Card" },
   { id: "flipkart-axis",       name: "Flipkart Axis Bank Card", issuer: "Axis Bank" },
