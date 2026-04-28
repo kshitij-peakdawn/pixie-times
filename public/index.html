@@ -177,6 +177,11 @@
   .comp-card-userbase { display: block; font-family: var(--font-body); font-size: 0.65rem; font-weight: 400; color: var(--ink-faint); margin-top: 1px; letter-spacing: 0.02em; }
   .comp-card-summary { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--ink-muted); margin-top: 5px; line-height: 1.4; }
   .comp-null { color: var(--ink-faint); font-style: italic; font-size: 0.75rem; }
+  .comp-table tr.own-card td { background: var(--accent-light); }
+  .comp-table tr.own-card td:first-child { background: #f0d8d5; border-bottom-color: #dba8a2; }
+  .comp-table tr.own-card:hover td { background: #f5dbd8; }
+  .comp-table tr.own-card:hover td:first-child { background: #eacac6; }
+  .comp-table tr.own-card td { border-bottom-color: #e8b4ae; }
 
   /* Changelog */
   .changelog-heading { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 500; margin-bottom: 0.5rem; }
@@ -445,10 +450,10 @@ function CompTable({ cards }) {
       ),
       e('tbody', null,
         cards.map(card =>
-          e('tr', { key: card.id || card.name },
+          e('tr', { key: card.id || card.name, className: card.isOwnCard ? 'own-card' : '' },
             e('td', null,
               card.name || card.id,
-              e('span', { className: 'comp-card-userbase' }, ({"amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || ''),
+              e('span', { className: 'comp-card-userbase' }, ({"pixel-hdfc": "HDFC Bank", "amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || ''),
               card.keyDifferentiator && e('span', { className: 'comp-card-summary' }, card.keyDifferentiator)
             ),
             COLS.map(c => e('td', { key: c.key, style: c.narrow ? { width: '80px' } : {} }, val(card[c.key])))
