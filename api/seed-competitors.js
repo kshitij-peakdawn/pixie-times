@@ -11,6 +11,7 @@ async function getClient() {
 }
 
 const TRACKED_CARDS = [
+  { id: "pixel-hdfc",        name: "Pixel Play",               issuer: "HDFC Bank",          isOwnCard: true },
   { id: "amazon-pay-icici",  name: "Amazon Pay Credit Card",  issuer: "ICICI Bank" },
   { id: "simplyclick-sbi",   name: "SBI SimplyCLICK",         issuer: "SBI Card" },
   { id: "flipkart-axis",     name: "Flipkart Axis Bank Card", issuer: "Axis Bank" },
@@ -25,7 +26,7 @@ const TRACKED_CARDS = [
 // Known current features as of April 2026 — Claude will validate and fill gaps
 const SEED_PROMPT = `You are a competitive intelligence analyst for Pixel Credit Card (HDFC Bank) — a digital-first, cashback-led card targeting Gen Z and young professionals.
 
-Populate the current feature profile for each of these Indian credit cards. Use your training knowledge. Be accurate and specific. If a detail is genuinely unknown, use null.
+Populate the current feature profile for each of these Indian credit cards. Include Pixel Play (HDFC Bank) as the first card — this is our own card and serves as the reference baseline. Use your training knowledge. Be accurate and specific. If a detail is genuinely unknown, use null.
 
 Cards to profile:
 ${TRACKED_CARDS.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('\n')}
@@ -43,6 +44,7 @@ For each card, return a JSON array with this exact shape:
     "rewardCap": "<monthly or annual cap on rewards, or 'None'>",
     "loungeAccess": "<Yes – unlimited / Yes – N per quarter / No>",
     "keyDifferentiator": "<one sentence on what makes this card unique in its segment>",
+    "isOwnCard": <true only for Pixel Play, omit or false for all others>,
     "lastUpdated": "Apr 2026"
   }
 ]
