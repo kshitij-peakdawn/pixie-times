@@ -29,6 +29,7 @@ const RSS_FEEDS = [
   { name: "Livemint",               url: "https://www.livemint.com/rss/money" },
   { name: "Financial Express",      url: "https://www.financialexpress.com/market/rss" },
   { name: "Hindu BusinessLine",     url: "https://www.thehindubusinessline.com/money-and-banking/feeder/default.rss" },
+  { name: "CardInsider",            url: "https://cardinsider.com/feed/" },
 ];
 
 function getQuarterLabel(date) {
@@ -120,6 +121,7 @@ From the articles below, for each card:
 1. Extract any changes this month (features added/removed, fee changes, reward changes, lounge changes)
 2. Update the card's profile fields if the change affects them (e.g. if lounge access was capped, update loungeAccess field)
 3. Record each change in changelog with impact: positive (card improved), negative (card worsened), neutral
+4. Look specifically for LIMITED TIME OFFERS — LTF (lifetime free) promotions, waived joining/annual fee campaigns, bonus cashback for new cardholders, accelerated rewards for a limited period. If found, populate activeOffer. If no active offer found for a card, set activeOffer to null to clear any previous offer.
 
 Today's date: ${today}
 
@@ -136,6 +138,12 @@ Return JSON:
         "rewardCap": "...",
         "loungeAccess": "...",
         "keyDifferentiator": "...",
+        "activeOffer": {
+          "label": "<short offer label e.g. LTF offer, Waived joining fee, 10% bonus cashback>",
+          "type": "<ltf|bonus|waiver|accelerated>",
+          "expiresOn": "<Mon DD, YYYY or null if no stated end date>",
+          "source": "<publication name>"
+        },
         "lastUpdated": "${today}"
       },
       "changelog": [
@@ -152,6 +160,7 @@ Return JSON:
 }
 
 Only include cards with actual news this month. Omit cards with no relevant articles.
+For activeOffer: include it in profileUpdates whenever you find an offer OR when you are certain no offer is running (set to null). This ensures stale offers get cleared.
 Return ONLY the JSON. No explanation, no markdown.
 
 ARTICLES:
