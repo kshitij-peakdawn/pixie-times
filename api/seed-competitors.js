@@ -45,10 +45,12 @@ For each card, return a JSON array with this exact shape:
     "loungeAccess": "<Yes – unlimited / Yes – N per quarter / No>",
     "keyDifferentiator": "<one sentence on what makes this card unique in its segment>",
     "isOwnCard": <true only for Pixel Play, omit or false for all others>,
+    "activeOffer": null,
     "lastUpdated": "Apr 2026"
   }
 ]
 
+For activeOffer: if you are aware of a current limited-time offer (LTF, waived fee, bonus cashback) for a card as of April 2026, populate it as: {"label": "<short label>", "type": "<ltf|bonus|waiver|accelerated>", "expiresOn": "<date or null>", "source": "Seed data"}. Otherwise set to null.
 Return ONLY the JSON array. No explanation, no markdown, no preamble.`;
 
 export default async function handler(req, res) {
@@ -61,19 +63,41 @@ export default async function handler(req, res) {
   try {
     const redis = await getClient();
 
-    // Check if already seeded — don't overwrite unless forced
-    const force = req.query.force === "true";
-    if (!force) {
-      const existing = await redis.get(`card:${TRACKED_CARDS[0].id}`);
-      if (existing) {
-        return res.status(200).json({
-          message: "Cards already seeded. Pass ?force=true to reseed.",
-          tip: "Use /api/refresh-competitors to update from live news instead."
-        });
-      }
+    // Optional: seed only a specific card e.g. ?card=pixel-hdfc
+    const cardFilter = req.query.card || null;
+    const cardsToSeed = cardFilter
+      ? TRACKED_CARDS.filter(c => c.id === cardFilter)
+      : TRACKED_CARDS;
+
+    if (cardsToSeed.length === 0) {
+      return res.status(400).json({ error: `Card '${cardFilter}' not found in tracked list.` });
     }
 
-    console.log("Calling Claude to seed card profiles...");
+    // Skip already-seeded cards unless ?force=true
+    const force = req.query.force === "true";
+    const cardsNeedingSeeed = force
+      ? cardsToSeed
+      : await Promise.all(cardsToSeed.map(async c => {
+          const existing = await redis.get(`card:${c.id}`);
+          return existing ? null : c;
+        })).then(results => results.filter(Boolean));
+
+    if (cardsNeedingSeeed.length === 0) {
+      return res.status(200).json({
+        message: "All specified cards already seeded. Pass ?force=true to overwrite.",
+        tip: "Use /api/refresh-competitors to update from live news instead."
+      });
+    }
+
+    // Build a targeted prompt for only the cards that need seeding
+    const targetedPrompt = SEED_PROMPT.replace(
+      TRACKED_CARDS.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('
+'),
+      cardsNeedingSeeed.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('
+')
+    );
+
+    console.log(`Seeding ${cardsNeedingSeeed.length} card(s): ${cardsNeedingSeeed.map(c => c.name).join(', ')}`);
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -85,7 +109,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 3000,
-        messages: [{ role: "user", content: SEED_PROMPT }],
+        messages: [{ role: "user", content: targetedPrompt }],
       }),
     });
 
@@ -98,13 +122,13 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Claude returned no profiles", raw: text });
     }
 
-    // Save each card profile to Redis
-    const index = TRACKED_CARDS.map(c => c.id);
-    await redis.set("cards:index", JSON.stringify(index));
+    // Always update the cards:index to include all tracked cards
+    const fullIndex = TRACKED_CARDS.map(c => c.id);
+    await redis.set("cards:index", JSON.stringify(fullIndex));
 
     for (const profile of profiles) {
       await redis.set(`card:${profile.id}`, JSON.stringify(profile));
-      // Initialise empty changelog if none exists
+      // Initialise empty changelog only if none exists — never overwrite existing changelog
       const existingLog = await redis.get(`card:${profile.id}:changelog`);
       if (!existingLog) {
         await redis.set(`card:${profile.id}:changelog`, JSON.stringify([]));
@@ -112,7 +136,7 @@ export default async function handler(req, res) {
     }
 
     return res.status(200).json({
-      message: "Cards seeded successfully",
+      message: "Seeded successfully",
       count: profiles.length,
       cards: profiles.map(p => p.name),
     });
