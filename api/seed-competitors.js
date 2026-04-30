@@ -91,10 +91,8 @@ export default async function handler(req, res) {
 
     // Build a targeted prompt for only the cards that need seeding
     const targetedPrompt = SEED_PROMPT.replace(
-      TRACKED_CARDS.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('
-'),
-      cardsNeedingSeeed.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('
-')
+      TRACKED_CARDS.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('\n'),
+      cardsNeedingSeeed.map(c => `- ${c.name} (${c.issuer}) [id: ${c.id}]`).join('\n')
     );
 
     console.log(`Seeding ${cardsNeedingSeeed.length} card(s): ${cardsNeedingSeeed.map(c => c.name).join(', ')}`);
