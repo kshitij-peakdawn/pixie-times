@@ -177,6 +177,7 @@
   .comp-card-userbase { display: block; font-family: var(--font-body); font-size: 0.65rem; font-weight: 400; color: var(--ink-faint); margin-top: 1px; letter-spacing: 0.02em; }
   .comp-card-summary { display: block; font-family: var(--font-body); font-size: 0.72rem; font-weight: 400; color: var(--ink-muted); margin-top: 5px; line-height: 1.4; }
   .comp-null { color: var(--ink-faint); font-style: italic; font-size: 0.75rem; }
+  .offer-tag { display: inline-block; margin-top: 4px; background: var(--gold-light); border: 1px solid #e8d090; color: var(--gold); border-radius: 3px; font-size: 0.6rem; font-weight: 500; padding: 1px 5px; letter-spacing: 0.04em; white-space: nowrap; }
   .comp-table tr.own-card td { background: var(--accent-light); }
   .comp-table tr.own-card td:first-child { background: #f0d8d5; border-bottom-color: #dba8a2; }
   .comp-table tr.own-card:hover td { background: #f5dbd8; }
@@ -433,13 +434,22 @@ function CompTable({ cards }) {
   function val(v) {
     return v ? v : e('span', { className: 'comp-null' }, '—');
   }
+
+  function isOfferExpired(expiresOn) {
+    if (!expiresOn) return false;
+    try {
+      return new Date(expiresOn) < new Date();
+    } catch { return false; }
+  }
+
   const COLS = [
-    { key: 'joiningFee',        label: 'Joining Fee',    narrow: true  },
-    { key: 'annualFee',         label: 'Annual Fee',     narrow: true  },
-    { key: 'feeWaiverThreshold',label: 'Fee Waiver',     narrow: true  },
-    { key: 'primaryReward',     label: 'Primary Reward', narrow: false },
-    { key: 'rewardCap',         label: 'Reward Cap',     narrow: false },
+    { key: 'joiningFee',         label: 'Joining Fee',    narrow: true,  offerCol: true  },
+    { key: 'annualFee',          label: 'Annual Fee',     narrow: true  },
+    { key: 'feeWaiverThreshold', label: 'Fee Waiver',     narrow: true  },
+    { key: 'primaryReward',      label: 'Primary Reward', narrow: false },
+    { key: 'rewardCap',          label: 'Reward Cap',     narrow: false },
   ];
+
   return e('div', { className: 'comp-table-wrap' },
     e('table', { className: 'comp-table' },
       e('thead', null,
@@ -449,16 +459,25 @@ function CompTable({ cards }) {
         )
       ),
       e('tbody', null,
-        cards.map(card =>
-          e('tr', { key: card.id || card.name, className: card.isOwnCard ? 'own-card' : '' },
+        cards.map(card => {
+          const offer = card.activeOffer && !isOfferExpired(card.activeOffer.expiresOn) ? card.activeOffer : null;
+          return e('tr', { key: card.id || card.name, className: card.isOwnCard ? 'own-card' : '' },
             e('td', null,
               card.name || card.id,
               e('span', { className: 'comp-card-userbase' }, ({"pixel-hdfc": "HDFC Bank", "amazon-pay-icici": "1.2 cr+ cards", "simplyclick-sbi": "80 lakh+ cards", "flipkart-axis": "50 lakh+ cards", "millennia-idfc": "25 lakh+ cards", "onecard": "15 lakh+ cards", "kotak-811": "12 lakh+ cards", "slice": "10 lakh+ cards", "fi-money": "4 lakh+ cards", "niyo-global": "3 lakh+ cards"})[card.id] || ''),
               card.keyDifferentiator && e('span', { className: 'comp-card-summary' }, card.keyDifferentiator)
             ),
-            COLS.map(c => e('td', { key: c.key, style: c.narrow ? { width: '80px' } : {} }, val(card[c.key])))
-          )
-        )
+            COLS.map(c =>
+              e('td', { key: c.key, style: c.narrow ? { width: '80px' } : {} },
+                val(card[c.key]),
+                // Show offer tag only in the joining fee column
+                c.offerCol && offer && e('span', { className: 'offer-tag', title: offer.expiresOn ? `Offer ends ${offer.expiresOn}` : 'Limited time offer' },
+                  '🏷 ', offer.label
+                )
+              )
+            )
+          );
+        })
       )
     )
   );
