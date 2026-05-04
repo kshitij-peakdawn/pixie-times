@@ -529,13 +529,7 @@ function CompetitionPage({ compData, onQCRClick }) {
       e('div', { className: 'qcr-title' }, `Pixel vs Competition · ${latestQCR.quarter}`),
       e('div', { className: 'qcr-preview' }, latestQCR.narrative)
     ),
-    cards.length === 0
-      ? e('div', { className: 'empty-state' },
-          e('div', { className: 'empty-title' }, 'Competition data coming soon'),
-          e('p', null, 'Run /api/seed-competitors to populate card profiles.')
-        )
-      : e(CompTable, { cards }),
-    cardsWithChangelog.length > 0 && e('div', null,
+    cardsWithChangelog.length > 0 && e('div', { style: { marginBottom: '1.75rem' } },
       e('div', { style: { fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, color: 'var(--ink)', marginBottom: '0.75rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--rule)' } }, 'Recent changes'),
       cardsWithChangelog.map(card =>
         e('div', { key: card.id, style: { marginBottom: '1rem' } },
@@ -545,7 +539,13 @@ function CompetitionPage({ compData, onQCRClick }) {
           (card.changelog || []).slice(0, 3).map((entry, i) => e(ChangelogEntry, { key: i, entry }))
         )
       )
-    )
+    ),
+    cards.length === 0
+      ? e('div', { className: 'empty-state' },
+          e('div', { className: 'empty-title' }, 'Competition data coming soon'),
+          e('p', null, 'Run /api/seed-competitors to populate card profiles.')
+        )
+      : e(CompTable, { cards })
   );
 }
 
