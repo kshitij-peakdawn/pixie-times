@@ -187,14 +187,18 @@
   /* Changelog */
   .changelog-heading { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); font-weight: 500; margin-bottom: 0.5rem; }
   .changelog-empty { font-size: 0.8rem; color: var(--ink-faint); font-style: italic; }
-  .changelog-entry { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.55rem 0; border-bottom: 1px solid var(--paper-warm); }
+  .changelog-entry { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.65rem 0; border-bottom: 1px solid var(--paper-warm); }
   .changelog-entry:last-child { border-bottom: none; }
   .change-impact { flex-shrink: 0; font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 6px; border-radius: 3px; margin-top: 1px; }
   .change-positive { background: var(--badge-launch-bg); color: var(--badge-launch); }
   .change-negative { background: #ffeaea; color: #991a1a; }
   .change-neutral  { background: var(--paper-warm); color: var(--ink-muted); }
   .change-text { font-size: 0.82rem; color: var(--ink); line-height: 1.45; flex: 1; min-width: 0; }
-  .change-meta { font-size: 0.67rem; color: var(--ink-faint); margin-top: 2px; }
+  .change-meta { font-size: 0.67rem; color: var(--ink-faint); margin-top: 3px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .change-source-link { color: var(--accent); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--accent-border); padding-bottom: 1px; transition: opacity 0.12s; }
+  .change-source-link:hover { opacity: 0.7; }
+  .change-pixel-relevance { margin-top: 5px; font-size: 0.78rem; color: var(--ink-muted); background: var(--paper-warm); border-left: 2px solid var(--accent); padding: 4px 8px; border-radius: 0 3px 3px 0; line-height: 1.5; }
+  .change-pixel-relevance-label { font-size: 0.6rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 2px; }
 
   /* QCR detail */
   .qcr-detail { max-width: 820px; margin: 0 auto; padding: 1.75rem 1.5rem 2rem; flex: 1; animation: fadeUp 0.2s ease both; }
@@ -425,7 +429,16 @@ function ChangelogEntry({ entry }) {
     e('span', { className: `change-impact ${impactClass}` }, impactLabel),
     e('div', { className: 'change-text' },
       entry.change,
-      e('div', { className: 'change-meta' }, entry.source, entry.date ? ` · ${entry.date}` : '')
+      entry.pixelRelevance && e('div', { className: 'change-pixel-relevance' },
+        e('div', { className: 'change-pixel-relevance-label' }, 'For Pixel'),
+        entry.pixelRelevance
+      ),
+      e('div', { className: 'change-meta' },
+        entry.sourceUrl
+          ? e('a', { href: entry.sourceUrl, className: 'change-source-link', target: '_blank', rel: 'noopener noreferrer' }, entry.source || 'Source', ' ↗')
+          : entry.source && e('span', null, entry.source),
+        entry.date && e('span', null, entry.date)
+      )
     )
   );
 }
