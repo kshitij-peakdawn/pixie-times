@@ -150,6 +150,7 @@ Return JSON:
         {
           "change": "<what changed, one sentence, plain English>",
           "impact": "<positive|negative|neutral>",
+          "pixelRelevance": "<1-2 sentences: why this specific change matters for Pixel's product, design, or business team — be concrete, e.g. if it's a feature Pixel lacks, say so; if it's a threat to Pixel's positioning as a digital-first Gen Z card, explain how; if it's an opportunity, spell it out>",
           "source": "<publication name>",
           "sourceUrl": "<url>",
           "date": "<Mon DD, YYYY>"
