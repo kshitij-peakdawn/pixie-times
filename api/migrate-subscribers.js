@@ -12,7 +12,7 @@ async function getClient() {
 
 // Run this once via POST /api/migrate-subscribers with x-refresh-secret header.
 // Safe to run multiple times — it won't overwrite preferences already set.
-// Also fixes subscribers who have preference records but are missing from competition set.
+// Step 0 fixes unsubscribe bug: legacy emails stored with mixed case couldn't be removed.
 export default async function handler(req, res) {
   const secret = req.headers["x-refresh-secret"];
   if (secret !== process.env.REFRESH_SECRET) {
@@ -21,12 +21,37 @@ export default async function handler(req, res) {
 
   try {
     const redis = await getClient();
-    const results = { migratedFromLegacy: 0, syncedToCompetition: 0, alreadyCorrect: 0 };
+    const results = { normalisedEmails: 0, migratedFromLegacy: 0, syncedToCompetition: 0, alreadyCorrect: 0 };
+
+    // Step 0: Normalise all email casing across all sets and preference records.
+    // Fixes the unsubscribe bug where legacy emails were stored with mixed case,
+    // causing sRem("subscribers:news", "user@hdfc.com") to miss "User@HDFC.com".
+    for (const setKey of ["subscribers", "subscribers:news", "subscribers:competition"]) {
+      const members = await redis.sMembers(setKey);
+      for (const email of members) {
+        const normalised = email.toLowerCase().trim();
+        if (normalised !== email) {
+          await redis.sRem(setKey, email);
+          await redis.sAdd(setKey, normalised);
+          // Migrate preference record key if stored under old casing
+          const oldKey = `subscriber:${email}`;
+          const newKey = `subscriber:${normalised}`;
+          const existingOld = await redis.get(oldKey);
+          const existingNew = await redis.get(newKey);
+          if (existingOld && !existingNew) {
+            await redis.set(newKey, existingOld);
+            await redis.del(oldKey);
+          }
+          results.normalisedEmails++;
+        }
+      }
+    }
 
     // Step 1: Migrate from old flat "subscribers" set (legacy)
     const oldEmails = await redis.sMembers("subscribers");
     for (const email of oldEmails) {
-      const key = `subscriber:${email}`;
+      const normalised = email.toLowerCase().trim();
+      const key = `subscriber:${normalised}`;
       const existing = await redis.get(key);
       if (!existing) {
         const data = {
@@ -36,14 +61,14 @@ export default async function handler(req, res) {
           migratedFromLegacy: true,
         };
         await redis.set(key, JSON.stringify(data));
-        await redis.sAdd("subscribers:news", email);
-        await redis.sAdd("subscribers:competition", email);
+        await redis.sAdd("subscribers:news", normalised);
+        await redis.sAdd("subscribers:competition", normalised);
         results.migratedFromLegacy++;
       }
     }
 
     // Step 2: Sync anyone in subscribers:news who has a preference record
-    // but is missing from subscribers:competition (the bug that caused issue 2)
+    // but is missing from subscribers:competition
     const newsMembers = await redis.sMembers("subscribers:news");
     for (const email of newsMembers) {
       const key = `subscriber:${email}`;
@@ -51,7 +76,6 @@ export default async function handler(req, res) {
       if (raw) {
         const data = JSON.parse(raw);
         if (data.competition !== false) {
-          // Should be in competition set — add if missing
           const inCompSet = await redis.sIsMember("subscribers:competition", email);
           if (!inCompSet) {
             await redis.sAdd("subscribers:competition", email);
@@ -61,7 +85,6 @@ export default async function handler(req, res) {
           }
         }
       } else {
-        // Has no preference record — create one with both true
         const data = { news: true, competition: true, subscribedAt: new Date().toISOString() };
         await redis.set(key, JSON.stringify(data));
         await redis.sAdd("subscribers:competition", email);
