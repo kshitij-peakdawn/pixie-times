@@ -323,25 +323,39 @@ async function saveEdition(stories) {
 export default async function handler(req, res) {
   // auth temporarily disabled for launch test
   try {
-    console.log("Step 1: Fetching articles from RSS feeds...");
-    const articles = await fetchArticles();
-    console.log(`Fetched ${articles.length} relevant articles after filtering`);
+    const { articles, feedStats, totalRaw } = await fetchArticles();
+
+    const feedDiagnostics = feedStats.map(s => ({
+      feed: s.name,
+      httpStatus: s.status,
+      articlesFound: s.rawCount,
+      error: s.error || null,
+    }));
 
     if (articles.length === 0) {
-      return res.status(200).json({ message: "No relevant articles found this week", stories: 0 });
+      return res.status(200).json({
+        message: "No relevant articles found this week",
+        stories: 0,
+        diagnostics: {
+          totalRawArticles: totalRaw,
+          afterKeywordAndDateFilter: 0,
+          feeds: feedDiagnostics,
+        },
+      });
     }
 
-    console.log("Step 2: Processing with Claude...");
     const stories = await processWithClaude(articles);
-    console.log(`Claude produced ${stories.length} stories`);
-
-    console.log("Step 3: Saving to Redis...");
     const edition = await saveEdition(stories);
 
     return res.status(200).json({
       message: "Edition generated successfully",
       editionId: edition.id,
       stories: stories.length,
+      diagnostics: {
+        totalRawArticles: totalRaw,
+        afterKeywordAndDateFilter: articles.length,
+        feeds: feedDiagnostics,
+      },
     });
   } catch (err) {
     console.error("Refresh error:", err);
