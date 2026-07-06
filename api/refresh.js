@@ -139,37 +139,41 @@ function parseRSS(xml, sourceName) {
 // ── Step 1: Fetch articles from RSS feeds ─────────────────────────────────
 async function fetchArticles() {
   const allArticles = [];
+  const feedStats = [];
   const oneWeekAgo = new Date();
   oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
   for (const feed of RSS_FEEDS) {
+    const stat = { name: feed.name, status: null, rawCount: 0, error: null };
     try {
       const res = await fetch(feed.url, {
         headers: { "User-Agent": "PixieTimes/1.0 RSS Reader" },
         signal: AbortSignal.timeout(8000),
       });
 
+      stat.status = res.status;
       if (!res.ok) {
-        console.log(`Feed ${feed.name} returned ${res.status}`);
+        stat.error = `HTTP ${res.status}`;
+        feedStats.push(stat);
         continue;
       }
 
       const xml = await res.text();
       const articles = parseRSS(xml, feed.name);
-      console.log(`${feed.name}: ${articles.length} articles`);
+      stat.rawCount = articles.length;
+      feedStats.push(stat);
       allArticles.push(...articles);
     } catch (err) {
-      console.error(`Failed to fetch ${feed.name}:`, err.message);
+      stat.error = err.message;
+      feedStats.push(stat);
     }
   }
 
-  // Filter by date (last 7 days) and keyword relevance
   const seen = new Set();
-  return allArticles.filter((a) => {
+  const filtered = allArticles.filter((a) => {
     if (!a.url || seen.has(a.url)) return false;
     seen.add(a.url);
 
-    // Date filter
     try {
       const pubDate = new Date(a.publishedAt);
       if (pubDate < oneWeekAgo) return false;
@@ -177,10 +181,11 @@ async function fetchArticles() {
       // keep if date is unparseable
     }
 
-    // Keyword filter — must contain at least one relevant keyword
     const text = `${a.title} ${a.description}`.toLowerCase();
     return RELEVANT_KEYWORDS.some((kw) => text.includes(kw));
   });
+
+  return { articles: filtered, feedStats, totalRaw: allArticles.length };
 }
 
 // ── Step 2: Process with Claude ────────────────────────────────────────────
